@@ -11,7 +11,7 @@ export default {
 </script>
 
 <style>
-  body{
+  .body{
     background-color: #193c6d;
     background-image: url(//img.alicdn.com/tps/TB1d.u8MXXXXXXuXFXXXXXXXXXX-1900-790.jpg);
     background-size: 100%;

@@ -1,85 +1,147 @@
 <template>
-  <el-form :rules="rules" class="login-container" label-position="left" label-width="0px" v-loading="loading">
-    <h3 class="login_title">系统登录</h3>
-    <el-form-item prop="account">
-      <el-input type="text" v-model="loginForm.username" auto-complete="off" placeholder="账号"></el-input>
-    </el-form-item>
-    <el-form-item prop="checkPass">
-      <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
-    </el-form-item>
-    <el-checkbox class="login_remember" v-model="checked" label-position="left">记住密码</el-checkbox>
-    <el-form-item style="width: 100%">
-      <el-button type="primary" @click.native.prevent="submitClick" style="width: 100%">登录</el-button>
-    </el-form-item>
-  </el-form>
 </template>
+
 <script>
-import {postRequest} from '../utils/api'
+  import THREE from '@/utils/three.min'
 
-export default{
-  data () {
-    return {
-      rules: {
-        account: [{required: true, message: '请输入用户名', trigger: 'blur'}],
-        checkPass: [{required: true, message: '请输入密码', trigger: 'blur'}]
-      },
-      checked: true,
-      loginForm: {
-        username: 'sang',
-        password: '123'
-      },
-      loading: false
-    }
-  },
-  methods: {
-    submitClick: function () {
-      var _this = this
-      this.loading = true
-      postRequest('/login', {
-        username: this.loginForm.username,
-        password: this.loginForm.password
-      }).then(resp => {
-        _this.loading = false
-        if (resp.status === 200) {
-          // 成功
-          var json = resp.data
-          if (json.status === 'success') {
-            _this.$router.replace({path: '/home'})
-          } else {
-            _this.$alert('登录失败!', '失败!')
+  let SEPARATION = 70,
+    AMOUNTX = 100,
+    AMOUNTY = 70;
+
+  let container;
+  let camera, scene, renderer;
+
+  let particles,
+    particle,
+    count = 0;
+
+  let mouseX = 85,
+    mouseY = -342;
+
+  let windowHalfX = window.innerWidth / 2;
+  let windowHalfY = window.innerHeight / 2;
+  export default {
+    beforeCreate () {
+      window.document.body.className = 'body'
+    },
+    beforeDestroy () {
+      window.document.body.className = ''
+    },
+    methods: {
+      init() {
+        container = document.createElement("div");
+        document.body.appendChild(container);
+        camera = new THREE.THREE.PerspectiveCamera(
+          120,
+          window.innerWidth / window.innerHeight,
+          1,
+          10000
+        );
+        container.style.cssText = "position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000";
+        camera.position.z = 1000;
+
+        scene =new THREE.THREE.Scene();
+
+        particles = new Array();
+
+        var PI2 = Math.PI * 2;
+        var material =new THREE.THREE.ParticleCanvasMaterial({
+          color: 0xe1e1e1,
+          program: function(context) {
+            context.beginPath();
+            context.arc(0, 0, 0.6, 0, PI2, true);
+            context.fill();
           }
-        } else {
-          // 失败
-          _this.$alert('登录失败!', '失败!')
+        });
+
+        var i = 0;
+
+        for (var ix = 0; ix < AMOUNTX; ix++) {
+          for (var iy = 0; iy < AMOUNTY; iy++) {
+            particle = particles[i++] = new THREE.THREE.Particle(material);
+            particle.position.x = ix * SEPARATION - AMOUNTX * SEPARATION / 2;
+            particle.position.z = iy * SEPARATION - AMOUNTY * SEPARATION / 2;
+            scene.add(particle);
+          }
         }
-      }, resp => {
-        _this.loading = false
-        _this.$alert('找不到服务器⊙﹏⊙∥!', '失败!')
-      })
+
+        renderer =new THREE.THREE.CanvasRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        document.addEventListener("mousemove", this.onDocumentMouseMove, false);
+        document.addEventListener("touchstart", this.onDocumentTouchStart, false);
+        document.addEventListener("touchmove",this. onDocumentTouchMove, false);
+
+        //
+
+        window.addEventListener("resize", this.onWindowResize, false);
+      },
+      onWindowResize() {
+        windowHalfX = window.innerWidth / 2;
+        windowHalfY = window.innerHeight / 2;
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      },
+      onDocumentMouseMove(event) {
+        mouseX = event.clientX - windowHalfX;
+        mouseY = event.clientY - windowHalfY;
+      },
+      onDocumentTouchStart(event) {
+        if (event.touches.length === 1) {
+          event.preventDefault();
+
+          mouseX = event.touches[0].pageX - windowHalfX;
+          mouseY = event.touches[0].pageY - windowHalfY;
+        }
+      },
+      onDocumentTouchMove(event) {
+        if (event.touches.length === 1) {
+          event.preventDefault();
+
+          mouseX = event.touches[0].pageX - windowHalfX;
+          mouseY = event.touches[0].pageY - windowHalfY;
+        }
+      },
+      animate() {
+        requestAnimationFrame(this.animate);
+
+        this.render();
+      },
+      render() {
+        camera.position.x += (mouseX - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY - camera.position.y) * 0.05;
+        camera.lookAt(scene.position);
+
+        var i = 0;
+
+        for (var ix = 0; ix < AMOUNTX; ix++) {
+          for (var iy = 0; iy < AMOUNTY; iy++) {
+            particle = particles[i++];
+            particle.position.y =
+              Math.sin((ix + count) * 0.3) * 50 +
+              Math.sin((iy + count) * 0.5) * 50;
+            particle.scale.x = particle.scale.y =
+              (Math.sin((ix + count) * 0.3) + 1) * 2 +
+              (Math.sin((iy + count) * 0.5) + 1) * 2;
+          }
+        }
+
+        renderer.render(scene, camera);
+
+        count += 0.1;
+      }
+    },
+    mounted() {
+      this.init()
+      this.animate()
     }
-  }
-}
+  };
+
 </script>
+
 <style>
-  .login-container {
-    border-radius: 15px;
-    background-clip: padding-box;
-    margin: 180px auto;
-    width: 350px;
-    padding: 35px 35px 15px 35px;
-    background: #fff;
-    border: 1px solid #eaeaea;
-    box-shadow: 0 0 25px #cac6c6;
-  }
-
-  .login_title {
-    margin: 0px auto 40px auto;
-    text-align: center;
-    color: #505458;
-  }
-
-  .login_remember {
-    margin: 0px 0px 35px 0px;
-    text-align: left;
-  }
 </style>
