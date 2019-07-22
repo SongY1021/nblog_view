@@ -3,24 +3,25 @@
     <!--<div class="">-->
       <!--<img src="../assets/img/banner.png" width="200" height="200"/>-->
     <!--</div>-->
-    <el-form :rules="rules" class="login-container" label-position="left" label-width="0px" v-loading="loading">
-    <div class="login_form">
-      <el-form-item prop="account">
-        <el-input type="text" v-model="username" placeholder="用户名" class="login-input tip" auto-complete="off" prefix-icon="icon-font el-icon-nblog-user"></el-input><br />
-      </el-form-item>
-      <el-form-item prop="checkPass">
-        <el-input type="password" v-model="password" placeholder="密码" class="login-input" auto-complete="off" prefix-icon="icon-font el-icon-nblog-password"></el-input>
-      </el-form-item>
-      <div class="login-btn">
-        <el-button type="primary" @click.native.prevent="submitClick">登录</el-button>
+    <el-form class="login-container" label-position="left" label-width="0px" v-loading="loading">
+      <div class="login_form">
+        <el-form-item prop="account">
+          <el-input type="text" v-model="loginForm.username" placeholder="用户名" class="login-input tip" auto-complete="off" prefix-icon="icon-font el-icon-nblog-user"></el-input><br />
+        </el-form-item>
+        <el-form-item prop="checkPass">
+          <el-input type="password" v-model="loginForm.password" placeholder="密码" class="login-input" auto-complete="off" prefix-icon="icon-font el-icon-nblog-password"></el-input>
+        </el-form-item>
+        <div class="login-btn">
+          <el-button type="primary" @click.native.prevent="submitClick">登录</el-button>
+        </div>
       </div>
-    </div>
     </el-form>
   </div>
 </template>
 
 <script>
 import THREE from '@/utils/three.min'
+import {postRequest} from '../utils/api'
 
 let SEPARATION = 70,
   AMOUNTX = 80,
@@ -39,11 +40,11 @@ let mouseX = 85,
 let windowHalfX = window.innerWidth / 2;
 let windowHalfY = window.innerHeight / 2;
 export default {
-  data(){
+  data () {
     return {
-      rules: {
-        account: [{required: true, message: '请输入用户名', trigger: 'blur'}],
-        checkPass: [{required: true, message: '请输入密码', trigger: 'blur'}]
+      loginForm: {
+        username: '梅子酒',
+        password: '123456'
       },
       loading: false
     }
@@ -53,13 +54,6 @@ export default {
   },
   beforeDestroy () {
     window.document.body.className = ''
-  },
-  data() {
-    return {
-      username: '',
-      password: '',
-      isBtnLoading: false
-    }
   },
   methods: {
     submitClick: function () {
@@ -96,7 +90,7 @@ export default {
         0.1,
         10000
       );
-      container.style.cssText = "position:fixed;top:0;left:0;opacity:0.9;z-index:10000";
+      container.style.cssText = "position:fixed;top:0;left:0;opacity:0.9;z-index:1";
       camera.position.z = 1000;
 
       scene =new THREE.THREE.Scene();
@@ -215,7 +209,7 @@ export default {
   }
   .login_form{
     position: relative;
-    z-index: 1000000;
+    z-index: 10;
     top:350px;
   }
   .login-input{
