@@ -1,4 +1,7 @@
 <template>
+  <div>
+    This is HellWord Page.
+  </div>
 </template>
 
 <script>
