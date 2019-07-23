@@ -1,21 +1,21 @@
 <template>
-  <div>
-    <!--<div class="">-->
-      <!--<img src="../assets/img/banner.png" width="200" height="200"/>-->
-    <!--</div>-->
+  <div class="Login">
     <el-form class="login-container" label-position="left" label-width="0px" v-loading="loading">
       <div class="login_form">
+        <img src="../assets/img/banner-1.png" width="400" height="200"/>
         <el-form-item prop="account">
           <el-input type="text" v-model="loginForm.username" placeholder="用户名" class="login-input tip" auto-complete="off" prefix-icon="icon-font el-icon-nblog-user"></el-input><br />
         </el-form-item>
         <el-form-item prop="checkPass">
           <el-input type="password" v-model="loginForm.password" placeholder="密码" class="login-input" auto-complete="off" prefix-icon="icon-font el-icon-nblog-password"></el-input>
         </el-form-item>
-        <div class="login-btn">
+        <el-form-item class="login-btn">
           <el-button type="primary" @click.native.prevent="submitClick">登录</el-button>
-        </div>
+        </el-form-item>
       </div>
     </el-form>
+    <div id="bgimg">
+    </div>
   </div>
 </template>
 
@@ -53,22 +53,23 @@ export default {
     window.document.body.className = 'body'
   },
   beforeDestroy () {
-    window.document.body.className = ''
+    window.document.body.className = '';
+    window.document.removeChild(document.getElementById('bgimg'));
   },
   methods: {
     submitClick: function () {
       var _this = this;
       this.loading = true;
       postRequest('/login', {
-        username: this.username,
-        password: this.password
+        username: this.loginForm.username,
+        password: this.loginForm.password
       }).then(resp=> {
         _this.loading = false;
         if (resp.status == 200) {
           //成功
           var json = resp.data;
-          if (json.status == 'success') {
-            _this.$router.replace({path: '/home'});
+          if (json.status == '0000') {
+            _this.$router.replace({path: '/hello'});
           } else {
             _this.$alert('登录失败!', '失败!');
           }
@@ -82,7 +83,7 @@ export default {
       });
     },
     init() {
-      container = document.createElement("div");
+      container = document.getElementById('bgimg')
       document.body.appendChild(container);
       camera = new THREE.THREE.PerspectiveCamera(
         120,
@@ -197,6 +198,9 @@ export default {
 </script>
 
 <style>
+  .Login{
+    position: initial;
+  }
   .el-input--prefix .el-input__inner {
     padding-left: 34px;
   }
@@ -205,12 +209,12 @@ export default {
   }
   .bannerImg{
     width: 200px;
-    height: 200px;
+    height: 100px;
   }
   .login_form{
     position: relative;
     z-index: 10;
-    top:350px;
+    top:260px;
   }
   .login-input{
     width:400px;
