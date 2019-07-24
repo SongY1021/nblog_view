@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
-import hello from '@/components/HelloWorld'
 
 Vue.use(Router)
+
+const HelloWord = () => import('@/components/HelloWorld')
 
 export default new Router({
   routes: [
@@ -12,11 +13,10 @@ export default new Router({
       name: '登录',
       hidden: true,
       component: Login
-    },
-    {
-      path: '/hello',
+    }, {
+      path: '/home',
       hidden: true,
-      component: hello
+      component: HelloWord
     }
   ]
 })

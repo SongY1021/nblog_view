@@ -1,8 +1,8 @@
 <template>
   <div class="Login">
-    <el-form class="login-container" label-position="left" label-width="0px" v-loading="loading">
+    <el-form class="login-container" label-position="left" label-width="0px" >
       <div class="login_form">
-        <img src="../assets/img/banner-1.png" width="400" height="200"/>
+        <img src="../assets/img/banner-2.png" width="260" height="70" style="margin-bottom: 50px"/>
         <el-form-item prop="account">
           <el-input type="text" v-model="loginForm.username" placeholder="用户名" class="login-input tip" auto-complete="off" prefix-icon="icon-font el-icon-nblog-user"></el-input><br />
         </el-form-item>
@@ -10,7 +10,7 @@
           <el-input type="password" v-model="loginForm.password" placeholder="密码" class="login-input" auto-complete="off" prefix-icon="icon-font el-icon-nblog-password"></el-input>
         </el-form-item>
         <el-form-item class="login-btn">
-          <el-button type="primary" @click.native.prevent="submitClick">登录</el-button>
+          <el-button type="primary" @click.native.prevent="submitClick" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.8)">登录</el-button>
         </el-form-item>
       </div>
     </el-form>
@@ -25,20 +25,20 @@ import {postRequest} from '../utils/api'
 
 let SEPARATION = 70,
   AMOUNTX = 80,
-  AMOUNTY = 50;
+  AMOUNTY = 50
 
-let container;
-let camera, scene, renderer;
+let container
+let camera, scene, renderer
 
 let particles,
   particle,
-  count = 0;
+  count = 0
 
 let mouseX = 85,
-  mouseY = -342;
+  mouseY = -342
 
-let windowHalfX = window.innerWidth / 2;
-let windowHalfY = window.innerHeight / 2;
+let windowHalfX = window.innerWidth / 2
+let windowHalfY = window.innerHeight / 2
 export default {
   data () {
     return {
@@ -54,146 +54,147 @@ export default {
   },
   beforeDestroy () {
     window.document.body.className = '';
-    window.document.removeChild(document.getElementById('bgimg'));
+    var elem=document.getElementById('bgimg');
+    elem.parentNode.removeChild(elem);
   },
   methods: {
     submitClick: function () {
-      var _this = this;
-      this.loading = true;
+      var _this = this
+      this.loading = true
       postRequest('/login', {
         username: this.loginForm.username,
         password: this.loginForm.password
-      }).then(resp=> {
-        _this.loading = false;
+      }).then(resp => {
+        _this.loading = false
         if (resp.status == 200) {
-          //成功
-          var json = resp.data;
+          // 成功
+          var json = resp.data
           if (json.status == '0000') {
-            _this.$router.replace({path: '/hello'});
+            _this.$router.replace({path: '/home'})
           } else {
-            _this.$alert('登录失败!', '失败!');
+            _this.$message('登录失败!', '失败!')
           }
         } else {
-          //失败
-          _this.$alert('登录失败!', '失败!');
+          // 失败
+          _this.$message('登录失败!', '失败!')
         }
-      }, resp=> {
-        _this.loading = false;
-        _this.$alert('找不到服务器⊙﹏⊙∥!', '失败!');
-      });
+      }, resp => {
+        _this.loading = false
+        _this.$message('找不到服务器⊙﹏⊙∥!', '失败!')
+      })
     },
-    init() {
+    init () {
       container = document.getElementById('bgimg')
-      document.body.appendChild(container);
+      document.body.appendChild(container)
       camera = new THREE.THREE.PerspectiveCamera(
         120,
         window.innerWidth / window.innerHeight,
         0.1,
         10000
-      );
-      container.style.cssText = "position:fixed;top:0;left:0;opacity:0.9;z-index:1";
-      camera.position.z = 1000;
+      )
+      container.style.cssText = 'position:fixed;top:0;left:0;opacity:0.9;z-index:1'
+      camera.position.z = 1000
 
-      scene =new THREE.THREE.Scene();
+      scene = new THREE.THREE.Scene()
 
-      particles = new Array();
+      particles = new Array()
 
-      var PI2 = Math.PI * 2;
-      var material =new THREE.THREE.ParticleCanvasMaterial({
+      var PI2 = Math.PI * 2
+      var material = new THREE.THREE.ParticleCanvasMaterial({
         color: 0xe1e1e1,
-        program: function(context) {
-          context.beginPath();
-          context.arc(0, 0, 0.6, 0, PI2, true);
-          context.fill();
+        program: function (context) {
+          context.beginPath()
+          context.arc(0, 0, 0.6, 0, PI2, true)
+          context.fill()
         }
-      });
+      })
 
-      var i = 0;
+      var i = 0
 
       for (var ix = 0; ix < AMOUNTX; ix++) {
         for (var iy = 0; iy < AMOUNTY; iy++) {
-          particle = particles[i++] = new THREE.THREE.Particle(material);
-          particle.position.x = ix * SEPARATION - AMOUNTX * SEPARATION / 2;
-          particle.position.z = iy * SEPARATION - AMOUNTY * SEPARATION / 2;
-          scene.add(particle);
+          particle = particles[i++] = new THREE.THREE.Particle(material)
+          particle.position.x = ix * SEPARATION - AMOUNTX * SEPARATION / 2
+          particle.position.z = iy * SEPARATION - AMOUNTY * SEPARATION / 2
+          scene.add(particle)
         }
       }
 
-      renderer =new THREE.THREE.CanvasRenderer();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      container.appendChild(renderer.domElement);
+      renderer = new THREE.THREE.CanvasRenderer()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      container.appendChild(renderer.domElement)
 
-      document.addEventListener("mousemove", this.onDocumentMouseMove, false);
-      document.addEventListener("touchstart", this.onDocumentTouchStart, false);
-      document.addEventListener("touchmove",this. onDocumentTouchMove, false);
+      document.addEventListener('mousemove', this.onDocumentMouseMove, false)
+      document.addEventListener('touchstart', this.onDocumentTouchStart, false)
+      document.addEventListener('touchmove', this.onDocumentTouchMove, false)
 
       //
 
-      window.addEventListener("resize", this.onWindowResize, false);
+      window.addEventListener('resize', this.onWindowResize, false)
     },
-    onWindowResize() {
-      windowHalfX = window.innerWidth / 2;
-      windowHalfY = window.innerHeight / 2;
+    onWindowResize () {
+      windowHalfX = window.innerWidth / 2
+      windowHalfY = window.innerHeight / 2
 
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
 
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(window.innerWidth, window.innerHeight)
     },
-    onDocumentMouseMove(event) {
-      mouseX = event.clientX - windowHalfX;
-      mouseY = event.clientY - windowHalfY;
+    onDocumentMouseMove (event) {
+      mouseX = event.clientX - windowHalfX
+      mouseY = event.clientY - windowHalfY
     },
-    onDocumentTouchStart(event) {
+    onDocumentTouchStart (event) {
       if (event.touches.length === 1) {
-        event.preventDefault();
+        event.preventDefault()
 
-        mouseX = event.touches[0].pageX - windowHalfX;
-        mouseY = event.touches[0].pageY - windowHalfY;
+        mouseX = event.touches[0].pageX - windowHalfX
+        mouseY = event.touches[0].pageY - windowHalfY
       }
     },
-    onDocumentTouchMove(event) {
+    onDocumentTouchMove (event) {
       if (event.touches.length === 1) {
-        event.preventDefault();
+        event.preventDefault()
 
-        mouseX = event.touches[0].pageX - windowHalfX;
-        mouseY = event.touches[0].pageY - windowHalfY;
+        mouseX = event.touches[0].pageX - windowHalfX
+        mouseY = event.touches[0].pageY - windowHalfY
       }
     },
-    animate() {
-      requestAnimationFrame(this.animate);
+    animate () {
+      requestAnimationFrame(this.animate)
 
-      this.render();
+      this.render()
     },
-    render() {
-      camera.position.x += (mouseX - camera.position.x) * 0.05;
-      camera.position.y += (-mouseY - camera.position.y) * 0.05;
-      camera.lookAt(scene.position);
+    render () {
+      camera.position.x += (mouseX - camera.position.x) * 0.05
+      camera.position.y += (-mouseY - camera.position.y) * 0.05
+      camera.lookAt(scene.position)
 
-      var i = 0;
+      var i = 0
 
       for (var ix = 0; ix < AMOUNTX; ix++) {
         for (var iy = 0; iy < AMOUNTY; iy++) {
-          particle = particles[i++];
+          particle = particles[i++]
           particle.position.y =
             Math.sin((ix + count) * 0.3) * 50 +
-            Math.sin((iy + count) * 0.5) * 50;
+            Math.sin((iy + count) * 0.5) * 50
           particle.scale.x = particle.scale.y =
             (Math.sin((ix + count) * 0.3) + 1) * 2 +
-            (Math.sin((iy + count) * 0.5) + 1) * 2;
+            (Math.sin((iy + count) * 0.5) + 1) * 2
         }
       }
 
-      renderer.render(scene, camera);
+      renderer.render(scene, camera)
 
-      count += 0.1;
+      count += 0.1
     }
   },
-  mounted() {
+  mounted () {
     this.init()
     this.animate()
   }
-};
+}
 
 </script>
 
