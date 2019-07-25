@@ -13,7 +13,8 @@ export default new Router({
       name: '登录',
       hidden: true,
       component: Login
-    }, {
+    },
+    {
       path: '/home',
       hidden: true,
       component: HelloWord
