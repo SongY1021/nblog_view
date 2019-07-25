@@ -1,23 +1,17 @@
 <template>
   <el-container  class="home_container">
-    <el-aside></el-aside>
+    <el-aside width="240px"></el-aside>
     <el-container>
       <el-header ></el-header>
       <el-main></el-main>
-      <el-footer></el-footer>
+      <el-footer height="40px"></el-footer>
     </el-container>
   </el-container>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  beforeCreate () {
-    window.document.body.className = 'body'
-  },
-  beforeDestroy () {
-    window.document.body.className = ''
-  }
+  name: 'HelloWorld'
 }
 </script>
 
@@ -31,15 +25,14 @@ export default {
     width: 100%;
   }
   .el-aside {
-    width: 200px;
-    background-color: #404040;
+    background-color: #2f4050;
   }
   .el-header{
-    height: 80px;
-    background-color: #0086b3;
+    border-bottom: #e9e9e9 solid 1px;
+    background-color: #f3f3f4;
   }
   .el-footer{
-    height:80px;
-    background-color: #0086b3;
+    border-top: #e9e9e9 solid 1px;
+    background-color: #f3f3f4;
   }
 </style>
