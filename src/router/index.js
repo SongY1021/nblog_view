@@ -4,7 +4,7 @@ import Login from '@/components/Login'
 
 Vue.use(Router)
 
-const Home = () => import('@/components/HelloWorld')
+const Home = () => import('@/components/Home')
 const test = () => import('@/components/test')
 
 export default new Router({
@@ -60,18 +60,6 @@ export default new Router({
     }, {
       path: '/home',
       component: Home,
-      name: '用户管理',
-      children: [
-        {
-          path: '/user',
-          iconCls: 'icon-font el-icon-nblog-kehu',
-          name: '用户管理',
-          component: test
-        }
-      ]
-    }, {
-      path: '/home',
-      component: Home,
       name: '栏目管理',
       children: [
         {
@@ -91,6 +79,18 @@ export default new Router({
           path: '/charts',
           iconCls: 'icon-font el-icon-nblog-shujutongji',
           name: '数据统计',
+          component: test
+        }
+      ]
+    }, {
+      path: '/home',
+      component: Home,
+      name: '用户管理',
+      children: [
+        {
+          path: '/user',
+          iconCls: 'icon-font el-icon-nblog-kehu',
+          name: '用户管理',
           component: test
         }
       ]
