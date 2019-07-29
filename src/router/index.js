@@ -6,6 +6,7 @@ Vue.use(Router)
 
 const Home = () => import('@/components/Home')
 const test = () => import('@/components/test')
+const ArticleList = () => import('@/components/ArticleList')
 
 export default new Router({
   routes: [
@@ -28,7 +29,7 @@ export default new Router({
         {
           path: '/articleList',
           name: '文章列表',
-          component: test,
+          component: ArticleList,
           meta: {
             keepAlive: true
           }

@@ -39,19 +39,47 @@
       <el-header class="header_toolbar" height="50px">
         <ul class="toolbar_menu">
           <li class="toolbar_item"  @click="collapseStatus" title="侧栏收起展开">
-            <i class="icon-font el-icon-nblog-shouqi" v-if="!isCollapse"></i>
-            <i class="icon-font el-icon-nblog-zhankai" v-if="isCollapse"></i>
+            <a href="javascript:;" class="box_item">
+              <i class="icon-font el-icon-nblog-shouqi" v-if="!isCollapse"></i>
+              <i class="icon-font el-icon-nblog-zhankai" v-if="isCollapse"></i>
+            </a>
           </li>
         </ul>
         <ul class="toolbar_menu menu_right">
           <li class="toolbar_item" title="消息">
-            <el-badge is-dot class="item">
-              <i class="icon-font el-icon-nblog-tongzhi"></i>
-            </el-badge>
+            <a href="javascript:;" class="box_item">
+              <el-badge is-dot class="item">
+                <i class="icon-font el-icon-nblog-tongzhi"></i>
+              </el-badge>
+            </a>
           </li>
           <li class="toolbar_item"  @click="screenStatus" title="全屏">
-            <i class="icon-font el-icon-nblog-quanpingzuidahua" v-if="!isFullScreen"></i>
-            <i class="icon-font el-icon-nblog-tuichuquanping" v-if="isFullScreen"></i>
+            <a href="javascript:;" class="box_item">
+              <i class="icon-font el-icon-nblog-quanpingzuidahua" v-if="!isFullScreen"></i>
+              <i class="icon-font el-icon-nblog-tuichuquanping" v-if="isFullScreen"></i>
+            </a>
+          </li>
+          <li class="toolbar_item" @mouseover="selectStatus">
+            <el-dropdown @command="handleCommand">
+              <a href="javascript:;" class="box_item">
+                <span class="el-dropdown-link">
+                  {{currentUserName}}
+                  <i class="icon-font el-icon-nblog-xiala-1" v-if="!isSelect"></i>
+                  <i class="icon-font el-icon-nblog-shang-" v-if="isSelect"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>个人主页</el-dropdown-item>
+                  <el-dropdown-item>我的文章</el-dropdown-item>
+                  <el-dropdown-item>账号信息</el-dropdown-item>
+                  <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </a>
+            </el-dropdown>
+          </li>
+          <li class="toolbar_item" title="更多">
+            <a href="javascript:;" class="box_item">
+              <i class="icon-font el-icon-nblog-gengduo"></i>
+            </a>
           </li>
         </ul>
       </el-header>
@@ -62,10 +90,12 @@
         </el-breadcrumb>
       </el-header>
       <el-main>
-        <keep-alive>
-          <router-view v-if="this.$route.meta.keepAlive"></router-view>
-        </keep-alive>
-        <router-view v-if="!this.$route.meta.keepAlive"></router-view>
+        <div class="content">
+          <keep-alive>
+            <router-view v-if="this.$route.meta.keepAlive"></router-view>
+          </keep-alive>
+          <router-view v-if="!this.$route.meta.keepAlive"></router-view>
+        </div>
       </el-main>
       <el-footer height="40px"></el-footer>
     </el-container>
@@ -73,12 +103,16 @@
 </template>
 
 <script>
+import {getRequest} from '../utils/api'
+
 export default {
   data () {
     return {
       activeIndex: '-1',
       isCollapse: false,
-      isFullScreen: false
+      isFullScreen: false,
+      isSelect: false,
+      currentUserName: ''
     }
   },
   methods: {
@@ -92,11 +126,64 @@ export default {
       console.log(key)
     },
     collapseStatus () {
-      this.isCollapse = !this.isCollapse;
+      this.isCollapse = !this.isCollapse
     },
     screenStatus () {
-      this.isFullScreen = !this.isFullScreen;
+      this.isFullScreen = !this.isFullScreen
+      if (this.isFullScreen) {
+        var element = document.documentElement
+        if (element.requestFullscreen) {
+          element.requestFullscreen()
+        } else if (element.msRequestFullscreen) {
+          element.msRequestFullscreen()
+        } else if (element.mozRequestFullScreen) {
+          element.mozRequestFullScreen()
+        } else if (element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen()
+        }
+      }else{
+        if (document.exitFullscreen) {
+          document.exitFullscreen()
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen()
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen()
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen()
+        }
+      }
+    },
+    selectStatus () {
+      this.isSelect = !this.isSelect
+    },
+    handleCommand (command) {
+      var _this = this;
+      if (command == 'logout') {
+        this.$confirm('注销登录吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(function () {
+          getRequest('/logout')
+          _this.currentUserName = '游客';
+          _this.$router.replace({path: '/'});
+        }, function () {
+          //取消
+        })
+      }
     }
+  },
+  mounted: function () {
+    var _this = this
+    getRequest('/currentUserInfo').then(function (o) {
+      if (o.data.code === 0) {
+        _this.currentUserName = o.data.reqData.username
+      } else {
+        _this.currentUserName = '游客'
+      }
+    }, function (msg) {
+      _this.currentUserName = '游客'
+    })
   }
 }
 </script>
@@ -141,12 +228,12 @@ export default {
   .el-aside .title_open{
     display: flex;
     margin-left: 30px;
-    padding-left: 70px;
+    padding-left: 55px;
     line-height: 50px;
-    font-size: 20px;
+    font-size: 16px;
     color: #FFF;
     background-image: url("../assets/img/logo-w.png");
-    background-size: 50px;
+    background-size: 46px;
     background-repeat: no-repeat;
   }
   .el-aside .title_close{
@@ -159,8 +246,9 @@ export default {
     background-position: center;
   }
   .el-header{
+    padding: 0;
     border-bottom: #eaeaea solid 1px;
-    background-color: #f3f3f3;
+    background-color: #f8f8f8;
   }
   .header_toolbar{
     line-height: 50px;
@@ -181,7 +269,7 @@ export default {
     /*border-top: 2px solid transparent;*/
     color: #909399;
     font-size: 14px;
-    padding: 0 20px;
+    /*padding: 0 20px;*/
     cursor: pointer;
     -webkit-transition: border-color .3s,background-color .3s,color .3s;
     -o-transition: border-color .3s,background-color .3s,color .3s;
@@ -189,11 +277,14 @@ export default {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
   }
-
+  .header_toolbar .toolbar_menu .toolbar_item .box_item{
+    display: inline-block;
+    padding: 0 15px;
+  }
   .header_toolbar .toolbar_menu .toolbar_item:before{
     content: "";
     position: absolute;
-    left: 50%;
+    left: 5%;
     top: 0px;
     width: 0;
     height: 2px;
@@ -209,14 +300,29 @@ export default {
     display: inline;
     vertical-align: auto;
   }
+  .header_toolbar .toolbar_menu .toolbar_item .el-dropdown {
+    /*vertical-align: middle;*/
+  }
+  .header_toolbar .toolbar_menu .toolbar_item a{
+    text-decoration: none;
+    color: #606266;
+  }
+  .el-dropdown-link{
+    /*display: inline-block;*/
+    /*vertical-align: middle;*/
+  }
+  .el-dropdown-menu {
+    top: 34px !important;
+  }
   .menu_right{
     float: right;
   }
   .breadcrumb{
+    padding: 0 20px;
     position: relative;
     border-bottom: #e9e9e9 solid 1px;
     box-shadow: 0 5px 8px 0 rgba(0,0,0,.05);
-    background-color: #f3f3f4;
+    background-color: #f8f8f8;
   }
   .el-footer{
     border-top: #e9e9e9 solid 1px;
