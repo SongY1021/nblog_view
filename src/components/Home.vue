@@ -329,6 +329,12 @@ export default {
     background-color: #f3f3f4;
   }
   .el-main{
+    padding:15px;
     background-color: #F2F2F2;
+  }
+  .el-main .content{
+    padding:10px 15px;
+    background-color: #f8f8f8;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
   }
 </style>

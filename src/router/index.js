@@ -23,19 +23,19 @@ export default new Router({
     }, {
       path: '/home',
       component: Home,
-      name: '文章管理',
+      name: '博客管理',
       iconCls: 'icon-font el-icon-nblog-xiangmu',
       children: [
         {
           path: '/articleList',
-          name: '文章列表',
+          name: '博客列表',
           component: ArticleList,
           meta: {
             keepAlive: true
           }
         }, {
           path: '/postArticle',
-          name: '发表文章',
+          name: '发表博客',
           component: test,
           meta: {
             keepAlive: false
