@@ -15,7 +15,7 @@
         :collapse="isCollapse"
         background-color="#2f4050"
         text-color="#fff"
-        active-text-color="#ffd04b" router>
+         router>
         <template v-for="(item,index) in this.$router.options.routes" v-if="!item.hidden">
           <el-submenu :index="index+''" v-if="item.children.length>1" :key="index">
             <template slot="title">
@@ -194,6 +194,9 @@ export default {
   .el-aside .icon-font{
     margin-right: 10px;
   }
+  .el-menu-item.is-active {
+    font-weight: bold;
+  }
   .open-enter-active, .open-enter{
     transition: opacity 2s;
   }
@@ -335,6 +338,6 @@ export default {
   .el-main .content{
     padding:10px 15px;
     background-color: #f8f8f8;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
   }
 </style>

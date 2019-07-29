@@ -6,7 +6,7 @@ Vue.use(Router)
 
 const Home = () => import('@/components/Home')
 const test = () => import('@/components/test')
-const ArticleList = () => import('@/components/ArticleList')
+const BlogList = () => import('@/components/BlogList')
 
 export default new Router({
   routes: [
@@ -27,9 +27,9 @@ export default new Router({
       iconCls: 'icon-font el-icon-nblog-xiangmu',
       children: [
         {
-          path: '/articleList',
+          path: '/BlogList',
           name: '博客列表',
-          component: ArticleList,
+          component: BlogList,
           meta: {
             keepAlive: true
           }
