@@ -91,10 +91,10 @@
       </el-header>
       <el-main>
         <div class="content">
-          <keep-alive>
-            <router-view v-if="this.$route.meta.keepAlive"></router-view>
-          </keep-alive>
-          <router-view v-if="!this.$route.meta.keepAlive"></router-view>
+            <keep-alive>
+              <router-view v-if="this.$route.meta.keepAlive"></router-view>
+            </keep-alive>
+            <router-view v-if="!this.$route.meta.keepAlive"></router-view>
         </div>
       </el-main>
       <el-footer height="40px"></el-footer>
@@ -332,6 +332,8 @@ export default {
     background-color: #f3f3f4;
   }
   .el-main{
+    height: 100%;
+    overflow: hidden;
     padding:15px;
     background-color: #F2F2F2;
   }
