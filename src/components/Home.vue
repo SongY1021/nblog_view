@@ -7,33 +7,37 @@
         </transition>
         <span class="title_close" v-show="isCollapse"></span>
       </div>
-      <el-menu
-        default-active="0"
-        class="el-menu-vertical-demo"
-        @open="handleOpen"
-        @close="handleClose"
-        :collapse="isCollapse"
-        background-color="#2f4050"
-        text-color="#fff"
-         router>
-        <template v-for="(item,index) in this.$router.options.routes" v-if="!item.hidden">
-          <el-submenu :index="index+''" v-if="item.children.length>1" :key="index">
-            <template slot="title">
-              <i :class="item.iconCls"></i>
-              <span>{{item.name}}</span>
+      <div class="menu-warp">
+        <el-scrollbar class="menu-scrollbar">
+          <el-menu
+          default-active="0"
+          class="el-menu-vertical-demo"
+          @open="handleOpen"
+          @close="handleClose"
+          :collapse="isCollapse"
+          background-color="#2f4050"
+          text-color="#fff"
+          router>
+          <template v-for="(item,index) in this.$router.options.routes" v-if="!item.hidden">
+            <el-submenu :index="index+''" v-if="item.children.length>1" :key="index">
+              <template slot="title">
+                <i :class="item.iconCls"></i>
+                <span>{{item.name}}</span>
+              </template>
+              <el-menu-item v-for="child in item.children" v-if="!child.hidden" :index="child.path" :key="child.path">
+                {{child.name}}
+              </el-menu-item>
+            </el-submenu>
+            <template v-else>
+              <el-menu-item :index="item.children[0].path">
+                <i :class="item.children[0].iconCls"></i>
+                <span slot="title">{{item.children[0].name}}</span>
+              </el-menu-item>
             </template>
-            <el-menu-item v-for="child in item.children" v-if="!child.hidden" :index="child.path" :key="child.path">
-              {{child.name}}
-            </el-menu-item>
-          </el-submenu>
-          <template v-else>
-            <el-menu-item :index="item.children[0].path">
-              <i :class="item.children[0].iconCls"></i>
-              <span slot="title">{{item.children[0].name}}</span>
-            </el-menu-item>
           </template>
-        </template>
-      </el-menu>
+        </el-menu>
+        </el-scrollbar>
+      </div>
     </el-aside>
     <el-container>
       <el-header class="header_toolbar" height="50px">
@@ -90,14 +94,16 @@
         </el-breadcrumb>
       </el-header>
       <el-main>
-        <div class="content">
-            <keep-alive>
-              <router-view v-if="this.$route.meta.keepAlive"></router-view>
-            </keep-alive>
-            <router-view v-if="!this.$route.meta.keepAlive"></router-view>
-        </div>
+        <el-scrollbar class="main-scrollbar">
+          <div class="content">
+              <keep-alive>
+                <router-view v-if="this.$route.meta.keepAlive"></router-view>
+              </keep-alive>
+              <router-view v-if="!this.$route.meta.keepAlive"></router-view>
+          </div>
+        </el-scrollbar>
       </el-main>
-      <el-footer height="40px"></el-footer>
+      <!--<el-footer height="40px"></el-footer>-->
     </el-container>
   </el-container>
 </template>
@@ -191,6 +197,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   i{color:#FFFFFF;}
+  .el-aside{
+    overflow: hidden;
+  }
   .el-aside .icon-font{
     margin-right: 10px;
   }
@@ -206,10 +215,22 @@ export default {
   .el-aside .el-menu{
     margin-top: 20px;
     border: none;
+    height: 100%;
+  }
+  .menu-warp{
+    overflow-x: hidden;
+    height: 400px;
+  }
+  .menu-scrollbar{
+    overflow-x: hidden;
+    height: 100%;
+  }
+  .menu-scrollbar>>>.el-scrollbar__wrap{
+    overflow-x: hidden;
   }
   .el-menu-vertical-demo:not(.el-menu--collapse) {
     width: 200px;
-    min-height: 400px;
+    height: 100%;
   }
   .el-breadcrumb{
     line-height: 45px;
@@ -333,13 +354,21 @@ export default {
   }
   .el-main{
     height: 100%;
-    overflow: hidden;
-    padding:15px;
+    overflow-x: hidden;
+    padding:15px 20px;
     background-color: #F2F2F2;
   }
   .el-main .content{
     padding:10px 15px;
+    overflow-x: hidden;
     background-color: #f8f8f8;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+  }
+  .main-scrollbar{
+    overflow-x: hidden;
+    height: 100%;
+  }
+  .main-scrollbar>>>.el-scrollbar__wrap{
+    overflow-x: hidden;
   }
 </style>

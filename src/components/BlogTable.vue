@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tab-warp">
     <el-row>
       <el-col :span="24">
         <div class="toolbar">
@@ -24,12 +24,11 @@
     </el-row>
     <el-row>
       <el-col :span="24" class="data_warp">
-
+        <el-scrollbar class="table-scrollbar">
           <el-table
           :data="tableData"
           :show-header="false"
-          style="width: 100%">
-            <el-scrollbar class="table-scrollbar">
+          style="width: 100%; height: 100%;">
           <el-table-column>
             <template slot-scope="scope">
               <el-row>
@@ -79,8 +78,8 @@
               </el-row>
             </template>
           </el-table-column>
-            </el-scrollbar>
         </el-table>
+        </el-scrollbar>
       </el-col>
     </el-row>
   </div>
@@ -272,6 +271,10 @@ export default {
 a{
   text-decoration: none;
 }
+.table-scrollbar{
+  overflow-x: hidden;
+  height: 100%;
+}
 .toolbar{
   padding: 20px 10px;
   background-color: rgba(232, 234, 236, 0.81);
@@ -286,7 +289,7 @@ a{
   line-height: 40px;
 }
 .data_warp{
-  height: 100%;
+  height: 675px;
   overflow-x: hidden;
 }
 .data_warp .table-scrollbar{
