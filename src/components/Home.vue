@@ -271,6 +271,7 @@ export default {
   }
   .el-header{
     padding: 0;
+    min-width: 600px;
     border-bottom: #eaeaea solid 1px;
     background-color: #f8f8f8;
   }
@@ -354,6 +355,7 @@ export default {
   }
   .el-main{
     height: 100%;
+    min-width: 600px;
     overflow-x: hidden;
     padding:15px 20px;
     background-color: #F2F2F2;
@@ -363,6 +365,7 @@ export default {
     overflow-x: hidden;
     background-color: #f8f8f8;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
   }
   .main-scrollbar{
     overflow-x: hidden;

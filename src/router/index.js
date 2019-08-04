@@ -7,6 +7,7 @@ Vue.use(Router)
 const Home = () => import('@/components/Home')
 const test = () => import('@/components/test')
 const BlogList = () => import('@/components/BlogList')
+const BlogDetail = () => import('@/components/BlogDetail')
 
 export default new Router({
   routes: [
@@ -41,9 +42,9 @@ export default new Router({
             keepAlive: false
           }
         }, {
-          path: '/blogDetail',
+          path: '/BlogDetail',
           name: '博客详情',
-          component: test,
+          component: BlogDetail,
           hidden: true,
           meta: {
             keepAlive: false

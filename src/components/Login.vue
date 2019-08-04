@@ -252,19 +252,19 @@ export default {
     background-color: inherit;
     border:#FFFFFF solid 1px;
   }
-  input::input-placeholder{
+  .login_form input::input-placeholder{
     color:#FFFFFF!important;
   }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+  .login_form input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
     color: #FFFFFF!important;
   }
-  input:-moz-placeholder, textarea:-moz-placeholder {
+  .login_form input:-moz-placeholder, textarea:-moz-placeholder {
     color: #FFFFFF!important;
   }
-  input::-moz-placeholder, textarea::-moz-placeholder {
+  .login_form input::-moz-placeholder, textarea::-moz-placeholder {
     color: #FFFFFF!important;
   }
-  input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+  .login_form input:-ms-input-placeholder, textarea:-ms-input-placeholder {
     color: #FFFFFF!important;
   }
 </style>

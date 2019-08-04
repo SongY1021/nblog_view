@@ -4,7 +4,7 @@
       <el-col :span="24">
         <div class="toolbar">
           <div class="search-item">
-            <el-select v-model="typeValue" clearable placeholder="文章类型" style="width: 100px">
+            <el-select v-model="searchOpt.typeValue" placeholder="文章类型" clearable style="width: 110px">
               <el-option
                 v-for="item in typeOptions"
                 :key="item.value"
@@ -15,66 +15,80 @@
             <el-input
               placeholder="通过标题搜索该分类下的博客..."
               prefix-icon="el-icon-search"
-              v-model="keywords" style="width: 300px">
+              v-model="searchOpt.keywords" style="width: 300px">
             </el-input>
-            <el-button type="primary" icon="el-icon-search" style="height:38px;vertical-align: middle; display: inline">搜索</el-button>
+            <el-button type="primary" icon="el-icon-search" style="height:38px;vertical-align: middle; display: inline" @click="searchClick">搜索</el-button>
           </div>
         </div>
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="24" class="data_warp">
+      <el-col :span="24" class="data_warp" :class="{'data_warp_min':minHeight}">
         <el-scrollbar class="table-scrollbar">
           <el-table
           :data="tableData"
           :show-header="false"
-          style="width: 100%; height: 100%;">
+          v-loading="loading"
+          style="width: 100%; height: 100%">
           <el-table-column>
             <template slot-scope="scope">
               <el-row>
-                <el-col :span="24"><div class="grid-content-title">
-                  <span class="title-tag" v-if="scope.row.state==='0'">草稿</span>
-                  <span class="title-tag" v-if="scope.row.state==='1' && scope.row.isTop>0">置顶</span>
-                  {{ scope.row.name }}</div>
+                <el-col :span="24">
+                  <div class="grid-content">
+                    <!--<span class="title-tag" v-if="scope.row.state == 0 ">草稿</span>-->
+                    <!--<span class="title-tag" v-if="scope.row.state == 1 && scope.row.top>0">置顶</span>-->
+                    <el-tag type="info" v-if="state != 0 && scope.row.state == 0 ">草稿</el-tag>
+                    <el-tag type="success" v-if="scope.row.state == 1 && scope.row.top>0">置顶</el-tag>
+                    <span class="grid-content-title" title="编辑">{{ scope.row.title }}</span>
+                  </div>
                 </el-col>
               </el-row>
               <el-row>
-                <el-col :span="12"><div class="grid-content-detail">
-                  <ul class="detail-list" >
-                    <li class="detail-list-item">
-                      <span v-if="scope.row.type === '1'">原创</span>
-                      <span v-if="scope.row.type === '2'">转载</span>
-                      <span v-if="scope.row.type === '3'">翻译</span>
-                    </li>
-                    <li class="detail-list-item">
-                      {{ scope.row.date }}
-                    </li>
-                    <li class="detail-list-item" title="阅读">
-                      <i class="icon-font el-icon-nblog-yueduliang"></i>{{ scope.row.read }}
-                    </li>
-                    <li class="detail-list-item" title="评论">
-                      <i class="icon-font el-icon-nblog-pinglun"></i>{{ scope.row.comment }}
-                    </li>
-                  </ul>
-                </div></el-col>
-                <el-col :span="12"><div class="grid-content-operation">
-                  <ul class="detail-list" >
-                    <li class="detail-list-item">
-                      <a href="javascript:;" class="item-btn">查看</a>
-                    </li>
-                    <li class="detail-list-item" v-if="scope.row.state != '0'">
-                      <a href="javascript:;" class="item-btn" v-if="scope.row.isComment >0">禁止评论</a>
-                      <a href="javascript:;" class="item-btn" v-else>允许评论</a>
-                    </li>
-                    <li class="detail-list-item" v-if="scope.row.state != '0'">
-                      <a href="javascript:;" class="item-btn" v-if="scope.row.isTop >0">取消置顶</a>
-                      <a href="javascript:;" class="item-btn" v-else>置顶</a>
-                    </li>
-                    <li class="detail-list-item">
-                      <a href="javascript:;" class="item-btn-del">删除</a>
-                    </li>
-                  </ul>
-                </div></el-col>
+                <el-col :span="24">
+                  <div class="grid-summary">
+                    {{ scope.row.summary }}
+                  </div>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="12">
+                  <div class="grid-content-detail">
+                    <ul class="detail-list" >
+                      <li class="detail-list-item">
+                        <span v-if="scope.row.typeName != ''">{{ scope.row.typeName }}</span>
+                      </li>
+                      <li class="detail-list-item">
+                        {{ scope.row.createtime }}
+                      </li>
+                      <li class="detail-list-item" title="阅读">
+                        <i class="icon-font el-icon-nblog-yueduliang"></i>{{ scope.row.readCount }}
+                      </li>
+                      <li class="detail-list-item" title="评论">
+                        <i class="icon-font el-icon-nblog-pinglun"></i>{{ scope.row.commentCount }}
+                      </li>
+                    </ul>
+                  </div>
+                </el-col>
+                <el-col :span="12">
+                  <div class="grid-content-operation">
+                    <ul class="detail-list" >
+                      <li class="detail-list-item">
+                        <a href="javascript:;" class="item-btn" @click="blogView(scope.row)" minHeight="minHeight">查看</a>
+                      </li>
+                      <li class="detail-list-item" v-if="scope.row.state == 1">
+                        <a href="javascript:;" class="item-btn" v-if="scope.row.isComment >0">禁止评论</a>
+                        <a href="javascript:;" class="item-btn" v-else>允许评论</a>
+                      </li>
+                      <li class="detail-list-item" v-if="scope.row.state == 1 ">
+                        <a href="javascript:;" class="item-btn" v-if="scope.row.top >0">取消置顶</a>
+                        <a href="javascript:;" class="item-btn" v-else>置顶</a>
+                      </li>
+                      <li class="detail-list-item">
+                        <a href="javascript:;" class="item-btn-del">删除</a>
+                      </li>
+                    </ul>
+                  </div>
+                </el-col>
               </el-row>
             </template>
           </el-table-column>
@@ -86,184 +100,53 @@
 </template>
 
 <script>
+import {getRequest} from '@/utils/api'
 export default {
   data () {
     return {
-      keywords: '',
-      typeValue: '',
+      loading: false,
+      page: {
+        currentPage: 1,
+        pageSize: 8
+      },
+      searchOpt: {
+        keywords: '',
+        typeValue: ''
+      },
       typeOptions: [{
-        value: '1',
+        value: '11',
         label: '原创'
       }, {
-        value: '2',
+        value: '12',
         label: '转载'
       }, {
-        value: '3',
+        value: '13',
         label: '翻译'
       }],
-      tableData: [{
-        date: '2019-05-02 17:31:12',
-        name: 'Linux安装RabbitMQ',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '0',
-        type: '1',
-        state: '1'
-      }, {
-        date: '2018-07-02 17:31:00',
-        name: 'SSH免密登录设置Q',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '0',
-        isTop: '1',
-        type: '2',
-        state: '2'
-      }, {
-        date: '2017-09-02 10:00:43',
-        name: 'Zookeeper集群搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '3',
-        state: '0'
-      }, {
-        date: '2016-10-08 17:53:49',
-        name: 'Spring入门学习——环境搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '1',
-        state: '0'
-      },{
-        date: '2019-05-02 17:31:12',
-        name: 'Linux安装RabbitMQ',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '0',
-        type: '1',
-        state: '1'
-      }, {
-        date: '2018-07-02 17:31:00',
-        name: 'SSH免密登录设置Q',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '0',
-        isTop: '1',
-        type: '2',
-        state: '2'
-      }, {
-        date: '2017-09-02 10:00:43',
-        name: 'Zookeeper集群搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '3',
-        state: '0'
-      }, {
-        date: '2016-10-08 17:53:49',
-        name: 'Spring入门学习——环境搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '1',
-        state: '0'
-      },{
-        date: '2019-05-02 17:31:12',
-        name: 'Linux安装RabbitMQ',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '0',
-        type: '1',
-        state: '1'
-      }, {
-        date: '2018-07-02 17:31:00',
-        name: 'SSH免密登录设置Q',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '0',
-        isTop: '1',
-        type: '2',
-        state: '2'
-      }, {
-        date: '2017-09-02 10:00:43',
-        name: 'Zookeeper集群搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '3',
-        state: '0'
-      }, {
-        date: '2016-10-08 17:53:49',
-        name: 'Spring入门学习——环境搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '1',
-        state: '0'
-      },{
-        date: '2019-05-02 17:31:12',
-        name: 'Linux安装RabbitMQ',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '0',
-        type: '1',
-        state: '1'
-      }, {
-        date: '2018-07-02 17:31:00',
-        name: 'SSH免密登录设置Q',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '0',
-        isTop: '1',
-        type: '2',
-        state: '2'
-      }, {
-        date: '2017-09-02 10:00:43',
-        name: 'Zookeeper集群搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '3',
-        state: '0'
-      }, {
-        date: '2016-10-08 17:53:49',
-        name: 'Spring入门学习——环境搭建',
-        read: '12',
-        comment: '10',
-        tag: '原创',
-        isComment: '1',
-        isTop: '1',
-        type: '1',
-        state: '0'
-      }]
+      tableData: []
     }
-  }
+  },
+  mounted: function () {
+    this.loadBlogList(this.page.currentPage, this.page.pageSize)
+    console.info(this.minHeight)
+  },
+  methods: {
+    searchClick () {
+      this.loadBlogList(1, this.page.pageSize)
+    },
+    loadBlogList (page, count) {
+      let url = '/blog/list?state=' + this.state + '&page=' + page + '&count=' + count + '&keywords=' + this.searchOpt.keywords + '&typeid=' + this.searchOpt.typeValue
+      getRequest(url).then(resp => {
+        if (resp.status === 200 && resp.data.code === 0) {
+          this.tableData = resp.data.reqData.blogs
+        }
+      })
+    },
+    blogView (row) {
+      this.$router.push({path: '/blogDetail', query: {bid: row.id}})
+    }
+  },
+  props: ['state', 'minHeight']
 }
 </script>
 
@@ -271,43 +154,65 @@ export default {
 a{
   text-decoration: none;
 }
-.table-scrollbar{
-  overflow-x: hidden;
-  height: 100%;
-}
+/*.table-scrollbar{*/
+  /*overflow-x: hidden;*/
+  /*height: 100%;*/
+/*}*/
 .toolbar{
+  min-width: 510px;
   padding: 20px 10px;
   background-color: rgba(232, 234, 236, 0.81);
   border-bottom: #EBEEF5 solid 1px;
+  overflow-x: auto;
 }
 .toolbar .search-item{
   display: inline;
 }
-.grid-content-title{
-  cursor: pointer;
-  font-size: 20px;
-  line-height: 40px;
-}
 .data_warp{
-  height: 675px;
+  height: 670px;
   overflow-x: hidden;
 }
+.data_warp_min{
+  height: 450px;
+}
 .data_warp .table-scrollbar{
+  overflow-x: hidden;
   height: 100%;
 }
 .data_warp .table-scrollbar>>>.el-scrollbar__wrap{
   overflow-x: hidden;
 }
+.grid-content{
+  line-height: 50px;
+  vertical-align: middle;
+}
+
+.grid-summary{
+  line-height: 30px;
+  vertical-align: middle;
+  padding-bottom: 5px;
+}
+
+.grid-content-title{
+  display: inline-block;
+  cursor: pointer;
+  font-size: 20px;
+  /*line-height: 40px;*/
+}
 .grid-content-title:hover{
   color: #409EFF;
 }
-.grid-content-title .title-tag{
+.grid-content .title-tag{
   margin-right: 10px;
   padding:4px 8px;
   font-size: 12px;
   color: #999;
   border: #ddd solid 1px;
-  vertical-align: middle;
+}
+.grid-content .el-tag{
+  margin-right: 10px;
+  height: 27px;
+  line-height: 26px;
 }
 .grid-content-detail,.grid-content-operation{
   line-height: 24px;
