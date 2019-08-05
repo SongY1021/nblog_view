@@ -23,7 +23,7 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="24" class="data_warp" :class="{'data_warp_min':minHeight}">
+      <el-col :span="24" class="data_warp" v-bind:style="{ height: heightNum }">
         <el-scrollbar class="table-scrollbar">
           <el-table
           :data="tableData"
@@ -73,15 +73,15 @@
                   <div class="grid-content-operation">
                     <ul class="detail-list" >
                       <li class="detail-list-item">
-                        <a href="javascript:;" class="item-btn" @click="blogView(scope.row)" minHeight="minHeight">查看</a>
+                        <a href="javascript:;" class="item-btn" @click="blogView(scope.row)" heightNum="heightNum">查看</a>
                       </li>
                       <li class="detail-list-item" v-if="scope.row.state == 1">
-                        <a href="javascript:;" class="item-btn" v-if="scope.row.isComment >0">禁止评论</a>
-                        <a href="javascript:;" class="item-btn" v-else>允许评论</a>
+                        <a href="javascript:;" class="item-btn" v-if="scope.row.oncomment >0" @click="stateClick(scope.row,'oncomment')">禁止评论</a>
+                        <a href="javascript:;" class="item-btn" v-else @click="stateClick(scope.row,'oncomment')">允许评论</a>
                       </li>
                       <li class="detail-list-item" v-if="scope.row.state == 1 ">
-                        <a href="javascript:;" class="item-btn" v-if="scope.row.top >0">取消置顶</a>
-                        <a href="javascript:;" class="item-btn" v-else>置顶</a>
+                        <a href="javascript:;" class="item-btn" v-if="scope.row.top >0" @click="stateClick(scope.row,'top')">取消置顶</a>
+                        <a href="javascript:;" class="item-btn" v-else @click="stateClick(scope.row,'top')">置顶</a>
                       </li>
                       <li class="detail-list-item">
                         <a href="javascript:;" class="item-btn-del">删除</a>
@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import {getRequest} from '@/utils/api'
+import {getRequest, postRequest} from '@/utils/api'
 export default {
   data () {
     return {
@@ -128,13 +128,13 @@ export default {
   },
   mounted: function () {
     this.loadBlogList(this.page.currentPage, this.page.pageSize)
-    console.info(this.minHeight)
   },
   methods: {
     searchClick () {
       this.loadBlogList(1, this.page.pageSize)
     },
     loadBlogList (page, count) {
+      console.info(this.state)
       let url = '/blog/list?state=' + this.state + '&page=' + page + '&count=' + count + '&keywords=' + this.searchOpt.keywords + '&typeid=' + this.searchOpt.typeValue
       getRequest(url).then(resp => {
         if (resp.status === 200 && resp.data.code === 0) {
@@ -144,9 +144,37 @@ export default {
     },
     blogView (row) {
       this.$router.push({path: '/blogDetail', query: {bid: row.id}})
+    },
+    stateClick (row, opt) {
+      let _this = this
+      let status = -1
+      if (opt === 'top') {
+        status = 1 - row.top
+      } else if (opt === 'oncomment') {
+        status = 1 - row.oncomment
+      }
+      postRequest('/blog/setstatus', {
+        bid: row.id,
+        opt: opt,
+        state: status
+      }).then(resp => {
+        if (resp.status === 200 && resp.data.code === 0) {
+          if (opt === 'top') {
+            row.top = status
+          } else if (opt === 'oncomment') {
+            row.oncomment = status
+          }
+          _this.$message.success('操作成功')
+        } else {
+          // 失败
+          _this.$message.error('操作失败!', '失败!')
+        }
+      }, resp => {
+        _this.$message.error('找不到服务器⊙﹏⊙∥!', '失败!')
+      })
     }
   },
-  props: ['state', 'minHeight']
+  props: ['state', 'heightNum']
 }
 </script>
 

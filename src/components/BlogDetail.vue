@@ -55,7 +55,7 @@
       <el-divider></el-divider>
     </el-col>
   </el-row>
-  <el-row v-loading="loading" class="data_warp" :class="{'data_warp_min':minHeight}">
+  <el-row v-loading="loading" class="data_warp" v-bind:style="{ height: heightNum }">
     <el-scrollbar class="detail-scrollbar">
       <el-col class="data_content">
         <div style="text-align: left" v-html="blog.htmlContent"></div>
@@ -85,15 +85,16 @@ export default{
       _this.loading = false
       _this.$message({type: 'error', message: '页面加载失败!'})
     })
+    this.heightNum = (window.innerHeight - 340) + 'px'
   },
   data () {
     return {
       blog: {},
+      heightNum: '625px',
       loading: false,
       activeName: ''
     }
-  },
-  props: ['minHeight']
+  }
 }
 </script>
 <style>

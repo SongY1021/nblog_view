@@ -147,7 +147,7 @@ export default {
         } else if (element.webkitRequestFullscreen) {
           element.webkitRequestFullscreen()
         }
-      }else{
+      } else {
         if (document.exitFullscreen) {
           document.exitFullscreen()
         } else if (document.msExitFullscreen) {
@@ -163,16 +163,16 @@ export default {
       this.isSelect = !this.isSelect
     },
     handleCommand (command) {
-      var _this = this;
-      if (command == 'logout') {
+      var _this = this
+      if (command === 'logout') {
         this.$confirm('注销登录吗?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(function () {
           getRequest('/logout')
-          _this.currentUserName = '游客';
-          _this.$router.replace({path: '/'});
+          _this.currentUserName = '游客'
+          _this.$router.replace({path: '/'})
         }, function () {
           //取消
         })

@@ -1,19 +1,19 @@
 <template>
   <el-tabs v-model="activeName" @tab-click="handleClick">
     <el-tab-pane :label="totleCount" name="first">
-      <blog_table state="-1" :minHeight="minHeight" ></blog_table>
+      <blog_table state="-1" :heightNum="heightNum"></blog_table>
     </el-tab-pane>
     <el-tab-pane :label="openCount" name="second">
-      <blog_table state="1" :minHeight="minHeight"></blog_table>
+      <blog_table state="1" :heightNum="heightNum"></blog_table>
     </el-tab-pane>
     <el-tab-pane :label="privateCount" name="third">
-      <blog_table state="2" :minHeight="minHeight"></blog_table>
+      <blog_table state="2" :heightNum="heightNum"></blog_table>
     </el-tab-pane>
     <el-tab-pane :label="draftCount" name="fourth">
-      <blog_table state="0" :minHeight="minHeight"></blog_table>
+      <blog_table state="0" :heightNum="heightNum"></blog_table>
     </el-tab-pane>
     <el-tab-pane :label="delCount" name="five">
-      <blog_table state="3" :minHeight="minHeight"></blog_table>
+      <blog_table state="3" :heightNum="heightNum"></blog_table>
     </el-tab-pane>
     <el-tab-pane label="博客管理" name="six">回收站</el-tab-pane>
   </el-tabs>
@@ -27,6 +27,7 @@ export default {
   data () {
     return {
       minHeight: false,
+      heightNum: '610px',
       activeName: 'first',
       totleCount: '全部(0)',
       openCount: '公开(0)',
@@ -37,13 +38,13 @@ export default {
   },
   mounted: function () {
     this.loadTip()
-    this.minHeight = window.innerHeight > 800?false:true
+    // this.minHeight = window.innerHeight > 800?false:true
+    this.heightNum = (window.innerHeight - 300) + 'px'
   },
   methods: {
     handleClick (tab, event) {
-      this.winHeight = window.innerHeight
-      this.minHeight = window.innerHeight > 800?false:true
-      console.info(window.innerHeight)
+      // this.minHeight = window.innerHeight > 800?false:true
+      this.heightNum = (window.innerHeight - 300) + 'px'
     },
     loadTip () {
       getRequest('/blog/tip').then(resp => {
