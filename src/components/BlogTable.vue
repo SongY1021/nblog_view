@@ -29,6 +29,7 @@
           :data="tableData"
           :show-header="false"
           v-loading="loading"
+          :empty-text="tableDesc"
           style="width: 100%; height: 100%">
           <el-table-column>
             <template slot-scope="scope">
@@ -38,6 +39,8 @@
                     <!--<span class="title-tag" v-if="scope.row.state == 0 ">草稿</span>-->
                     <!--<span class="title-tag" v-if="scope.row.state == 1 && scope.row.top>0">置顶</span>-->
                     <el-tag type="info" v-if="state != 0 && scope.row.state == 0 ">草稿</el-tag>
+                    <el-tag type="danger" v-if="state != 0 && scope.row.state == 2 ">私密</el-tag>
+                    <el-tag type="warning" v-if="scope.row.state == 1 && scope.row.oncomment == 0">禁止评论</el-tag>
                     <el-tag type="success" v-if="scope.row.state == 1 && scope.row.top>0">置顶</el-tag>
                     <span class="grid-content-title" title="编辑">{{ scope.row.title }}</span>
                   </div>
@@ -84,7 +87,11 @@
                         <a href="javascript:;" class="item-btn" v-else @click="stateClick(scope.row,'top')">置顶</a>
                       </li>
                       <li class="detail-list-item">
-                        <a href="javascript:;" class="item-btn-del">删除</a>
+                        <a href="javascript:;" class="item-btn" v-if="scope.row.state === 3"  @click="stateClick(scope.row,'recovery')">恢复至草稿箱</a>
+                      </li>
+                      <li class="detail-list-item">
+                        <a href="javascript:;" class="item-btn-del" v-if="scope.row.state === 3"  @click="stateClick(scope.row,'delete')">彻底删除</a>
+                        <a href="javascript:;" class="item-btn-del" v-else @click="stateClick(scope.row,'delete')">删除</a>
                       </li>
                     </ul>
                   </div>
@@ -105,6 +112,7 @@ export default {
   data () {
     return {
       loading: false,
+      tableDesc: '数据加载中···',
       page: {
         currentPage: 1,
         pageSize: 8
@@ -127,19 +135,28 @@ export default {
     }
   },
   mounted: function () {
+    this.loading = true
     this.loadBlogList(this.page.currentPage, this.page.pageSize)
   },
   methods: {
     searchClick () {
+      this.loading = true
       this.loadBlogList(1, this.page.pageSize)
     },
     loadBlogList (page, count) {
-      console.info(this.state)
       let url = '/blog/list?state=' + this.state + '&page=' + page + '&count=' + count + '&keywords=' + this.searchOpt.keywords + '&typeid=' + this.searchOpt.typeValue
       getRequest(url).then(resp => {
         if (resp.status === 200 && resp.data.code === 0) {
           this.tableData = resp.data.reqData.blogs
+          if (this.tableData.length === 0) {
+            this.tableDesc = '暂无数据'
+          }
         }
+        this.loading = false
+      }, resp => {
+        this.$message.error('找不到服务器⊙﹏⊙∥!', '失败!')
+        this.loading = false
+        this.tableDesc = '暂无数据'
       })
     },
     blogView (row) {
@@ -148,30 +165,68 @@ export default {
     stateClick (row, opt) {
       let _this = this
       let status = -1
+      let strConfirmDesc = '确认删除吗?'
       if (opt === 'top') {
-        status = 1 - row.top
+        status = row.top
       } else if (opt === 'oncomment') {
-        status = 1 - row.oncomment
-      }
-      postRequest('/blog/setstatus', {
-        bid: row.id,
-        opt: opt,
-        state: status
-      }).then(resp => {
-        if (resp.status === 200 && resp.data.code === 0) {
-          if (opt === 'top') {
-            row.top = status
-          } else if (opt === 'oncomment') {
-            row.oncomment = status
-          }
-          _this.$message.success('操作成功')
+        status = row.oncomment
+      } else if (opt === 'delete') {
+        if (row.state === 3) {
+          strConfirmDesc = '确认彻底删除吗? 删除后将不能恢复!'
         } else {
-          // 失败
-          _this.$message.error('操作失败!', '失败!')
+          status = row.state
         }
-      }, resp => {
-        _this.$message.error('找不到服务器⊙﹏⊙∥!', '失败!')
-      })
+      }
+      if (opt === 'delete') {
+        this.$confirm(strConfirmDesc, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(function () {
+          postRequest('/blog/setstatus', {
+            bid: row.id,
+            opt: opt,
+            state: status
+          }).then(resp => {
+            if (resp.status === 200 && resp.data.code === 0) {
+              _this.searchClick()
+              _this.$emit('loadTip')
+              _this.$message.success('删除成功', '成功')
+            } else {
+              // 失败
+              _this.$message.error('删除失败!', '失败!')
+            }
+          }, resp => {
+            _this.$message.error('找不到服务器⊙﹏⊙∥!', '失败!')
+          })
+        }, function () {
+        })
+      } else {
+        postRequest('/blog/setstatus', {
+          bid: row.id,
+          opt: opt,
+          state: status
+        }).then(resp => {
+          if (resp.status === 200 && resp.data.code === 0) {
+            if (opt === 'top') {
+              row.top = status
+              this.searchClick()
+            } else if (opt === 'oncomment') {
+              row.oncomment = status
+            }
+            if (opt === 'recovery') {
+              _this.searchClick()
+              _this.$emit('loadTip')
+            }
+            _this.$message.success('操作成功', '成功')
+          } else {
+            // 失败
+            _this.$message.error('操作失败!', '失败!')
+          }
+        }, resp => {
+          _this.$message.error('找不到服务器⊙﹏⊙∥!', '失败!')
+        })
+      }
     }
   },
   props: ['state', 'heightNum']

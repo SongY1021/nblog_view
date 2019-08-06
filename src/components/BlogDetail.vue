@@ -24,6 +24,9 @@
               <span class="title-tag" v-if="blog.state == 1 && blog.top>0">置顶</span>
             </li>
             <li class="detail-list-item">
+              <span class="title-tag" v-if="blog.state == 2" style="color:#F56C6C;">私密</span>
+            </li>
+            <li class="detail-list-item">
               <a href="javascript:;" class="item-btn" >{{ blog.username }}</a>
             </li>
             <li class="detail-list-item">

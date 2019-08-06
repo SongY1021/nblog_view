@@ -1,19 +1,20 @@
 <template>
   <el-tabs v-model="activeName" @tab-click="handleClick">
     <el-tab-pane :label="totleCount" name="first">
-      <blog_table state="-1" :heightNum="heightNum"></blog_table>
+      <blog_table state="-1" :heightNum="heightNum" v-if="activeName == 'first'" @loadTip="loadTip"></blog_table>
     </el-tab-pane>
     <el-tab-pane :label="openCount" name="second">
-      <blog_table state="1" :heightNum="heightNum"></blog_table>
+      <blog_table state="1" :heightNum="heightNum" v-if="activeName == 'second'" @loadTip="loadTip"></blog_table>
     </el-tab-pane>
     <el-tab-pane :label="privateCount" name="third">
-      <blog_table state="2" :heightNum="heightNum"></blog_table>
+      <blog_table state="2" :heightNum="heightNum" v-if="activeName == 'third'" @loadTip="loadTip"></blog_table>
     </el-tab-pane>
     <el-tab-pane :label="draftCount" name="fourth">
-      <blog_table state="0" :heightNum="heightNum"></blog_table>
+      <blog_table state="0" :heightNum="heightNum" v-if="activeName == 'fourth'" @loadTip="loadTip"></blog_table>
     </el-tab-pane>
-    <el-tab-pane :label="delCount" name="five">
-      <blog_table state="3" :heightNum="heightNum"></blog_table>
+    <el-tab-pane name="five">
+      <span slot="label" class="delCount"><i class="el-icon-delete"></i> {{delCount}}</span>
+      <blog_table state="3" :heightNum="heightNum" v-if="activeName == 'five'" @loadTip="loadTip"></blog_table>
     </el-tab-pane>
     <el-tab-pane label="博客管理" name="six">回收站</el-tab-pane>
   </el-tabs>
@@ -68,5 +69,8 @@ export default {
 <style scoped>
   .el-tabs{
     height: 100%;
+  }
+  .delCount .el-icon-delete{
+    font-size: 16px;
   }
 </style>
