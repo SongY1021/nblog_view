@@ -8,6 +8,7 @@ const Home = () => import('@/components/Home')
 const test = () => import('@/components/test')
 const BlogList = () => import('@/components/BlogList')
 const BlogDetail = () => import('@/components/BlogDetail')
+const BlogRelease = () => import('@/components/BlogRelease')
 
 export default new Router({
   routes: [
@@ -35,9 +36,9 @@ export default new Router({
             keepAlive: true
           }
         }, {
-          path: '/postArticle',
+          path: '/BlogRelease',
           name: '发表博客',
-          component: test,
+          component: BlogRelease,
           meta: {
             keepAlive: false
           }
