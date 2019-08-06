@@ -209,10 +209,10 @@ export default {
         }).then(resp => {
           if (resp.status === 200 && resp.data.code === 0) {
             if (opt === 'top') {
-              row.top = status
+              row.top = 1 - status
               this.searchClick()
             } else if (opt === 'oncomment') {
-              row.oncomment = status
+              row.oncomment = 1 - status
             }
             if (opt === 'recovery') {
               _this.searchClick()

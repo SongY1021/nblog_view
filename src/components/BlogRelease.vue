@@ -27,7 +27,28 @@
     </el-row>
     <el-row class="attr">
       <el-col :span="24" class="tags">
-        标签类别...
+        <label >
+          <span>文章标签：</span>
+        <el-tag
+          :key="tag"
+          v-for="tag in dynamicTags"
+          closable
+          :disable-transitions="false"
+          @close="handleClose(tag)">
+          {{tag}}
+        </el-tag>
+        <el-input
+          class="input-new-tag"
+          v-if="inputVisible"
+          v-model="inputValue"
+          ref="saveTagInput"
+          size="small"
+          @keyup.enter.native="handleInputConfirm"
+          @blur="handleInputConfirm"
+        >
+        </el-input>
+        <el-button type="text" icon="icon-font el-icon-nblog-tianjia-f" v-else class="button-new-tag" size="small" @click="showInput">添加标签</el-button>
+        </label>
       </el-col>
     </el-row>
     <el-row>
@@ -57,11 +78,35 @@ export default{
       }, {
         value: '13',
         label: '翻译'
-      }]
+      }],
+      dynamicTags: [],
+      inputVisible: false,
+      inputValue: ''
     }
   },
   components: {
     mavonEditor
+  },
+  methods: {
+    handleClose (tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+    },
+
+    showInput () {
+      this.inputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+
+    handleInputConfirm () {
+      let inputValue = this.inputValue
+      if (inputValue) {
+        this.dynamicTags.push(inputValue)
+      }
+      this.inputVisible = false
+      this.inputValue = ''
+    }
   }
 }
 </script>
@@ -107,5 +152,31 @@ export default{
   .attr{
     background-color: rgba(232, 234, 236, 0.81);
     padding: 15px 10px;
+  }
+  .attr .button-new-tag {
+    font-size: 14px;
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .attr .button-new-tag span{
+    line-height: 30px;
+    display: inline-flex;
+    vertical-align: middle;
+    letter-spacing: 2px;
+  }
+  .attr .icon-font {
+    line-height: 30px;
+    vertical-align: middle;
+  }
+  .el-tag + .el-tag {
+    margin-left: 10px;
+  }
+  .attr .input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: middle;
   }
 </style>
