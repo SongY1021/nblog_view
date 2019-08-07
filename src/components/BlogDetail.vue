@@ -1,9 +1,9 @@
 <template>
   <div>
   <el-row>
-    <el-col :span="24" class="toolbar">
+    <el-col :span="24" class="detail-toolbar">
       <div style="text-align: left;">
-        <el-button type="text" icon="el-icon-back" @click="goBack" style="padding-bottom: 0px;">返回</el-button>
+        <el-button type="text" icon="icon-font el-icon-nblog-ai207" @click="goBack" style="padding-bottom: 0px;">返回</el-button>
       </div>
     </el-col>
     <el-col :span="24" >
@@ -124,7 +124,7 @@ export default{
   .data_warp .detail-scrollbar .el-scrollbar__bar{
     right:0;
   }
-  .toolbar{
+  .detail-toolbar{
     padding-bottom: 20px;
   }
   .detail-content{

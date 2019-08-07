@@ -22,13 +22,14 @@
     </el-row>
     <el-row class="content">
       <el-col :span="24" >
-        <mavon-editor style="height: 100%;width: 100%;" ref=md v-model="blog.mdContent" class="editor"></mavon-editor>
+        <mavon-editor v-bind:style="{ height: heightNum }" ref=md v-model="blog.mdContent" class="editor"></mavon-editor>
       </el-col>
     </el-row>
     <el-row class="attr">
-      <el-col :span="24" class="tags">
-        <label >
-          <span>文章标签：</span>
+      <el-col :span="2" class="label">
+        文章标签:
+      </el-col>
+      <el-col :span="22" class="tags">
         <el-tag
           :key="tag"
           v-for="tag in dynamicTags"
@@ -48,12 +49,22 @@
         >
         </el-input>
         <el-button type="text" icon="icon-font el-icon-nblog-tianjia-f" v-else class="button-new-tag" size="small" @click="showInput">添加标签</el-button>
-        </label>
+      </el-col>
+      <el-col :span="2" class="label">
+        发布类型:
+      </el-col>
+      <el-col :span="22" class="tags radio">
+        <el-radio-group v-model="strState">
+          <el-radio :label="1">公开</el-radio>
+          <el-radio :label="2">私密</el-radio>
+        </el-radio-group>
       </el-col>
     </el-row>
     <el-row>
-      <el-col :span="24" class="toolbar">
-        操作
+      <el-col :span="24" class="release-toolbar">
+        <el-button plain icon="icon-font el-icon-nblog-baocun">保存为草稿</el-button>
+        <el-button type="primary" icon="icon-font el-icon-nblog-fasong">发布博客</el-button>
+        <el-button type="danger" icon="icon-font el-icon-nblog-fanhui1" @click="goBack">返回</el-button>
       </el-col>
     </el-row>
   </div>
@@ -66,6 +77,8 @@ export default{
     return {
       typeValue: '',
       blogTitle: '',
+      strState: 1,
+      heightNum: '400px',
       blog: {
         mdContent: ''
       },
@@ -87,18 +100,22 @@ export default{
   components: {
     mavonEditor
   },
+  mounted: function () {
+    this.heightNum = (window.innerHeight - 470) + 'px'
+  },
   methods: {
+    goBack () {
+      this.$router.go(-1)
+    },
     handleClose (tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
     },
-
     showInput () {
       this.inputVisible = true
       this.$nextTick(_ => {
         this.$refs.saveTagInput.$refs.input.focus()
       })
     },
-
     handleInputConfirm () {
       let inputValue = this.inputValue
       if (inputValue) {
@@ -133,12 +150,18 @@ export default{
     line-height: 46px;
     font-size: initial;
   }
+  .title .el-input-group__append, .title .el-input-group__prepend{
+    background-color: #FFFFFF;
+  }
   .content{
     background-color: rgba(232, 234, 236, 0.81);
     padding: 0 10px;
   }
   .content .v-note-wrapper {
-    min-height: 400px;
+    /*min-height: 400px;*/
+  }
+  .content .editor{
+    /*min-height: 500px;*/
   }
   .content .v-note-wrapper .v-note-op.shadow{
     box-shadow: none;
@@ -152,6 +175,18 @@ export default{
   .attr{
     background-color: rgba(232, 234, 236, 0.81);
     padding: 15px 10px;
+  }
+  .attr .label{
+    padding:5px 0;
+    line-height: 48px;
+    height: 50px;
+    color: #575757;
+    padding-left: 4px;
+  }
+  .attr .tags{
+    padding:5px 0;
+    line-height: 48px;
+    height: 50px;
   }
   .attr .button-new-tag {
     font-size: 14px;
@@ -178,5 +213,17 @@ export default{
     width: 90px;
     margin-left: 10px;
     vertical-align: middle;
+  }
+  .attr .radio{
+    padding-left: 10px;
+  }
+  .release-toolbar{
+    background-color: rgba(232, 234, 236, 0.81);
+    padding: 30px 10px 20px;
+  }
+  .release-toolbar .el-button{
+    height:50px;
+    font-size: 15px;
+    padding: 12px 26px;
   }
 </style>
