@@ -12,20 +12,22 @@
           <el-select v-model="blog.typeid" slot="prepend" placeholder="文章类型" clearable style="width: 140px;">
             <el-option
               v-for="item in typeOptions"
-              :key="item.typeid"
+              :key=item.typeid
               :label="item.label"
-              :value="item.typeid">
+              :value=item.typeid>
             </el-option>
           </el-select>
         </el-input>
       </el-col>
     </el-row>
-    <el-row class="content">
+    <el-row class="content" >
       <el-col :span="24" >
-        <mavon-editor v-bind:style="{ height: heightNum }" ref=md v-model="blog.mdContent" class="editor" aria-placeholder></mavon-editor>
+        <div class="editor" v-bind:style="{ height: heightNum }">
+          <mavon-editor style="width: 100%; height: 100%;" ref=md v-model="blog.mdContent" class="editor" aria-placeholder></mavon-editor>
+        </div>
       </el-col>
     </el-row>
-    <el-row class="attr">
+    <el-row class="attr" v-loading="loading">
       <el-col :span="2" class="label">
         文章标签:
       </el-col>
@@ -35,8 +37,8 @@
           v-for="tag in blog.tags"
           closable
           :disable-transitions="false"
-          @close="handleClose(tag.name)">
-          {{tag.name}}
+          @close="handleClose(tag)">
+          {{tag}}
         </el-tag>
         <el-input
           class="input-new-tag"
@@ -54,7 +56,7 @@
         发布类型:
       </el-col>
       <el-col :span="22" class="tags radio">
-        <el-radio-group v-model="state">
+        <el-radio-group v-model="r_state">
           <el-radio :label="1">公开</el-radio>
           <el-radio :label="2">私密</el-radio>
         </el-radio-group>
@@ -62,7 +64,7 @@
     </el-row>
     <el-row>
       <el-col :span="24" class="release-toolbar">
-        <el-button plain icon="icon-font el-icon-nblog-baocun">保存为草稿</el-button>
+        <el-button plain icon="icon-font el-icon-nblog-baocun" v-if="blog.state == 0">保存为草稿</el-button>
         <el-button type="primary" icon="icon-font el-icon-nblog-fasong">发布博客</el-button>
         <el-button type="danger" icon="icon-font el-icon-nblog-fanhui1" @click="goBack">返回</el-button>
       </el-col>
@@ -70,27 +72,30 @@
   </div>
 </template>
 <script>
+import {getRequest} from '@/utils/api'
 import {mavonEditor} from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 export default{
   data () {
     return {
-      strState: 1,
+      loading: false,
       heightNum: '400px',
+      r_state: 1,
       blog: {
         typeid: '',
         title: '',
+        state: 0,
         tags: [],
         mdContent: ''
       },
       typeOptions: [{
-        typeid: '11',
+        typeid: 11,
         label: '原创'
       }, {
-        typeid: '12',
+        typeid: 12,
         label: '转载'
       }, {
-        typeid: '13',
+        typeid: 13,
         label: '翻译'
       }],
       inputVisible: false,
@@ -103,12 +108,30 @@ export default{
   mounted: function () {
     this.heightNum = (window.innerHeight - 470) + 'px'
     let blogP = this.$route.query.blog
+    let bid = this.$route.query.bid
     let _this = this
     if (_this.isNotEmpty(blogP)) {
       _this.blog = blogP
+      blogP.state === 0 ? _this.r_state = 1 : _this.r_state = blogP.state
+    }
+    if (_this.isNotEmpty(bid)) {
+      _this.loadBlog(bid)
     }
   },
   methods: {
+    loadBlog (bid) {
+      var _this = this
+      this.loading = true
+      getRequest('/blog/' + bid).then(resp => {
+        if (resp.status === 200 && resp.data.code === 0) {
+          _this.blog = resp.data.reqData
+        }
+        _this.loading = false
+      }, resp => {
+        _this.loading = false
+        _this.$message({type: 'error', message: '页面加载失败!'})
+      })
+    },
     isNotEmpty (obj) {
       if (obj != null && obj != '' && obj != undefined) {
         return true
@@ -169,10 +192,9 @@ export default{
     padding: 0 10px;
   }
   .content .v-note-wrapper {
-    /*min-height: 400px;*/
   }
   .content .editor{
-    /*min-height: 500px;*/
+    min-height: 280px;
   }
   .content .v-note-wrapper .v-note-op.shadow{
     box-shadow: none;

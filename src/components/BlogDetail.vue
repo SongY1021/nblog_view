@@ -38,7 +38,7 @@
             <li class="detail-list-item" >
               <el-tag type="success" v-for="(item,index) in blog.tags" :key="index" size="small"
                       style="margin-right: 10px">
-                {{item.name}}
+                {{item}}
               </el-tag>
             </li>
           </ul>
@@ -48,7 +48,7 @@
         <div class="detail-content-operation">
           <ul class="detail-list" >
             <li class="detail-list-item">
-              <a href="javascript:;" @click="handleEdit(blog)" class="item-btn" >编辑</a>
+              <a href="javascript:;" v-if="blog.state != 3" @click="handleEdit(blog.id)" class="item-btn" >编辑</a>
             </li>
           </ul>
         </div>
@@ -74,8 +74,8 @@ export default{
     goBack () {
       this.$router.go(-1)
     },
-    handleEdit (blog) {
-      this.$router.push({path: '/editBlog', query: {blog: blog}})
+    handleEdit (bid) {
+      this.$router.push({path: '/editBlog', query: {bid: bid}})
     }
   },
   mounted: function () {

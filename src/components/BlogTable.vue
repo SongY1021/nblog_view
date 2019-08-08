@@ -42,7 +42,8 @@
                     <el-tag type="danger" v-if="state != 0 && scope.row.state == 2 ">私密</el-tag>
                     <el-tag type="warning" v-if="scope.row.state == 1 && scope.row.oncomment == 0">禁止评论</el-tag>
                     <el-tag type="success" v-if="scope.row.state == 1 && scope.row.top>0">置顶</el-tag>
-                    <span class="grid-content-title" title="编辑">{{ scope.row.title }}</span>
+                    <span class="grid-content-title" title="不可编辑" v-if="scope.row.state == 3">{{ scope.row.title }}</span>
+                    <span class="grid-content-title" title="编辑" v-else @click="handleEdit(scope.row.id)">{{ scope.row.title }}</span>
                   </div>
                 </el-col>
               </el-row>
@@ -139,6 +140,9 @@ export default {
     this.loadBlogList(this.page.currentPage, this.page.pageSize)
   },
   methods: {
+    handleEdit (id) {
+      this.$router.push({path: '/editBlog', query: {bid: id}})
+    },
     searchClick () {
       this.loading = true
       this.loadBlogList(1, this.page.pageSize)
@@ -160,7 +164,7 @@ export default {
       })
     },
     blogView (row) {
-      this.$router.push({path: '/blogDetail', query: {bid: row.id}})
+      this.$router.push({path: '/BlogDetail', query: {bid: row.id}})
     },
     stateClick (row, opt) {
       let _this = this
