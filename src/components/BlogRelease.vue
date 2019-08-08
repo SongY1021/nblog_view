@@ -8,13 +8,13 @@
           minlength="5"
           maxlength="50"
           class="input-item"
-          v-model="blogTitle">
-          <el-select v-model="typeValue" slot="prepend" placeholder="文章类型" clearable style="width: 140px;">
+          v-model="blog.title">
+          <el-select v-model="blog.typeid" slot="prepend" placeholder="文章类型" clearable style="width: 140px;">
             <el-option
               v-for="item in typeOptions"
-              :key="item.value"
+              :key="item.typeid"
               :label="item.label"
-              :value="item.value">
+              :value="item.typeid">
             </el-option>
           </el-select>
         </el-input>
@@ -22,7 +22,7 @@
     </el-row>
     <el-row class="content">
       <el-col :span="24" >
-        <mavon-editor v-bind:style="{ height: heightNum }" ref=md v-model="blog.mdContent" class="editor"></mavon-editor>
+        <mavon-editor v-bind:style="{ height: heightNum }" ref=md v-model="blog.mdContent" class="editor" aria-placeholder></mavon-editor>
       </el-col>
     </el-row>
     <el-row class="attr">
@@ -32,11 +32,11 @@
       <el-col :span="22" class="tags">
         <el-tag
           :key="tag"
-          v-for="tag in dynamicTags"
+          v-for="tag in blog.tags"
           closable
           :disable-transitions="false"
-          @close="handleClose(tag)">
-          {{tag}}
+          @close="handleClose(tag.name)">
+          {{tag.name}}
         </el-tag>
         <el-input
           class="input-new-tag"
@@ -54,7 +54,7 @@
         发布类型:
       </el-col>
       <el-col :span="22" class="tags radio">
-        <el-radio-group v-model="strState">
+        <el-radio-group v-model="state">
           <el-radio :label="1">公开</el-radio>
           <el-radio :label="2">私密</el-radio>
         </el-radio-group>
@@ -75,24 +75,24 @@ import 'mavon-editor/dist/css/index.css'
 export default{
   data () {
     return {
-      typeValue: '',
-      blogTitle: '',
       strState: 1,
       heightNum: '400px',
       blog: {
+        typeid: '',
+        title: '',
+        tags: [],
         mdContent: ''
       },
       typeOptions: [{
-        value: '11',
+        typeid: '11',
         label: '原创'
       }, {
-        value: '12',
+        typeid: '12',
         label: '转载'
       }, {
-        value: '13',
+        typeid: '13',
         label: '翻译'
       }],
-      dynamicTags: [],
       inputVisible: false,
       inputValue: ''
     }
@@ -102,13 +102,24 @@ export default{
   },
   mounted: function () {
     this.heightNum = (window.innerHeight - 470) + 'px'
+    let blogP = this.$route.query.blog
+    let _this = this
+    if (_this.isNotEmpty(blogP)) {
+      _this.blog = blogP
+    }
   },
   methods: {
+    isNotEmpty (obj) {
+      if (obj != null && obj != '' && obj != undefined) {
+        return true
+      }
+      return false
+    },
     goBack () {
       this.$router.go(-1)
     },
     handleClose (tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
+      this.blog.tags.splice(this.blog.tags.indexOf(tag), 1)
     },
     showInput () {
       this.inputVisible = true
@@ -119,7 +130,7 @@ export default{
     handleInputConfirm () {
       let inputValue = this.inputValue
       if (inputValue) {
-        this.dynamicTags.push(inputValue)
+        this.blog.tags.push(inputValue)
       }
       this.inputVisible = false
       this.inputValue = ''

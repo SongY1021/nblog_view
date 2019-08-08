@@ -53,7 +53,7 @@ export default new Router({
         }, {
           path: '/editBlog',
           name: '编辑博客',
-          component: test,
+          component: BlogRelease,
           hidden: true,
           meta: {
             keepAlive: false

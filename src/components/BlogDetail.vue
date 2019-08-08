@@ -48,7 +48,7 @@
         <div class="detail-content-operation">
           <ul class="detail-list" >
             <li class="detail-list-item">
-              <a href="javascript:;" class="item-btn" >编辑</a>
+              <a href="javascript:;" @click="handleEdit(blog)" class="item-btn" >编辑</a>
             </li>
           </ul>
         </div>
@@ -73,6 +73,9 @@ export default{
   methods: {
     goBack () {
       this.$router.go(-1)
+    },
+    handleEdit (blog) {
+      this.$router.push({path: '/editBlog', query: {blog: blog}})
     }
   },
   mounted: function () {

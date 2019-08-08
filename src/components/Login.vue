@@ -10,7 +10,7 @@
           <el-input type="password" v-model="loginForm.password" placeholder="密码" class="login-input" auto-complete="off" prefix-icon="icon-font el-icon-nblog-password"></el-input>
         </el-form-item>
         <el-form-item class="login-btn">
-          <el-button type="primary" @click.native.prevent="submitClick" @keyup.enter.native="submitClick" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.8)">登录</el-button>
+          <el-button type="primary" @click.native.prevent="submitClick" @keyup.enter.native.prevent="submitClick" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0.8)">登录</el-button>
         </el-form-item>
       </div>
     </el-form>
@@ -58,6 +58,9 @@ export default {
     elem.parentNode.removeChild(elem);
   },
   methods: {
+    KeyUpEsc:function(){
+      alert("监听到esc键")
+    },
     submitClick: function () {
       var _this = this
       this.loading = true
