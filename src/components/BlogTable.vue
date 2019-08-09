@@ -138,6 +138,11 @@ export default {
   mounted: function () {
     this.loading = true
     this.loadBlogList(this.page.currentPage, this.page.pageSize)
+    var _this = this
+    window.bus.$on('blogTableReload', function () {
+      _this.loading = true
+      _this.loadBlogList(_this.page.currentPage, _this.page.pageSize)
+    })
   },
   methods: {
     handleEdit (id) {

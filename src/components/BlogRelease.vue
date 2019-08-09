@@ -64,16 +64,17 @@
     </el-row>
     <el-row>
       <el-col :span="24" class="release-toolbar">
-        <el-button plain icon="icon-font el-icon-nblog-baocun" v-if="blog.state == 0">保存为草稿</el-button>
-        <el-button type="primary" icon="icon-font el-icon-nblog-fasong">发布博客</el-button>
+        <el-button plain icon="icon-font el-icon-nblog-baocun" v-if="blog.state == 0" @click="saveBlog(0)">保存为草稿</el-button>
+        <el-button type="primary" icon="icon-font el-icon-nblog-fasong" @click="saveBlog()">发布博客</el-button>
         <el-button type="danger" icon="icon-font el-icon-nblog-fanhui1" @click="goBack">返回</el-button>
       </el-col>
     </el-row>
   </div>
 </template>
 <script>
-import {getRequest} from '@/utils/api'
+import {getRequest, postRequest} from '@/utils/api'
 import {mavonEditor} from 'mavon-editor'
+import {isNotNullORBlank} from '../utils/utils'
 import 'mavon-editor/dist/css/index.css'
 export default{
   data () {
@@ -82,6 +83,7 @@ export default{
       heightNum: '400px',
       r_state: 1,
       blog: {
+        id: '',
         typeid: '',
         title: '',
         state: 0,
@@ -110,12 +112,13 @@ export default{
     let blogP = this.$route.query.blog
     let bid = this.$route.query.bid
     let _this = this
-    if (_this.isNotEmpty(blogP)) {
+    if (isNotNullORBlank(blogP)) {
       _this.blog = blogP
       blogP.state === 0 ? _this.r_state = 1 : _this.r_state = blogP.state
     }
-    if (_this.isNotEmpty(bid)) {
+    if (isNotNullORBlank(bid)) {
       _this.loadBlog(bid)
+      _this.blog.id = bid
     }
   },
   methods: {
@@ -131,12 +134,6 @@ export default{
         _this.loading = false
         _this.$message({type: 'error', message: '页面加载失败!'})
       })
-    },
-    isNotEmpty (obj) {
-      if (obj != null && obj != '' && obj != undefined) {
-        return true
-      }
-      return false
     },
     goBack () {
       this.$router.go(-1)
@@ -157,6 +154,58 @@ export default{
       }
       this.inputVisible = false
       this.inputValue = ''
+    },
+    saveBlog (s) {
+      if (!this.checkForm()) {
+        return
+      }
+      let blogState = this.r_state
+      if (isNotNullORBlank(s)) {
+        blogState = 0
+      }
+      let _this = this
+      _this.loading = true
+      postRequest('/blog/', {
+        id: _this.blog.id,
+        title: _this.blog.title,
+        typeid: _this.blog.typeid,
+        state: blogState,
+        mdContent: _this.blog.mdContent,
+        htmlContent: _this.$refs.md.d_render,
+        tags: _this.blog.tags
+      }).then(resp => {
+        _this.loading = false
+        if (resp.status === 200 && resp.data.code === 0) {
+          _this.$message({type: 'success', message: blogState === 0 ? '保存成功!' : '发布成功!'})
+          window.bus.$emit('blogTableReload')
+          if (blogState != 0) {
+            _this.$router.replace({path: '/BlogList'})
+          }
+        }
+      }, resp => {
+        _this.loading = false
+        _this.$message({type: 'error', message: blogState === 0 ? '保存草稿失败!' : '博客发布失败!'})
+      })
+    },
+    checkForm () {
+      let _this = this
+      if (!isNotNullORBlank(_this.blog.typeid)) {
+        _this.$message.error('文章类型不能为空!')
+        return false
+      } else if (!isNotNullORBlank(_this.blog.title)) {
+        _this.$message.error('标题不能为空!')
+        return false
+      } else if (_this.blog.title.length < 5 || _this.blog.title.length > 50) {
+        _this.$message.error('标题按长度在5-50个字之间!')
+        return false
+      } else if (!isNotNullORBlank(_this.blog.mdContent)) {
+        _this.$message.error('文章内容不能为空!')
+        return false
+      } else if (!isNotNullORBlank(_this.blog.mdContent)) {
+        _this.$message.error('文章内容不能为空!')
+        return false
+      }
+      return true
     }
   }
 }
