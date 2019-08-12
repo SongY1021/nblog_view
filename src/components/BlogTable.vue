@@ -31,7 +31,7 @@
           v-loading="loading"
           :empty-text="tableDesc"
           v-infinite-scroll="rollLoad"
-          infinite-scroll-disabled="disabled"
+          :infinite-scroll-disabled="disabled"
           infinite-scroll-immediate="false"
           style="width: 100%; height: 100%;">
           <el-table-column>
@@ -159,6 +159,7 @@ export default {
       return this.tableData.length >= this.page.totle
     },
     disabled () {
+      console.info('调用了')
       return this.page.roll_loading || this.noMore
     }
   },
