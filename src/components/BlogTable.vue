@@ -30,7 +30,10 @@
           :show-header="false"
           v-loading="loading"
           :empty-text="tableDesc"
-          style="width: 100%; height: 100%">
+          v-infinite-scroll="rollLoad"
+          infinite-scroll-disabled="disabled"
+          infinite-scroll-immediate="false"
+          style="width: 100%; height: 100%;">
           <el-table-column>
             <template slot-scope="scope">
               <el-row>
@@ -101,6 +104,8 @@
             </template>
           </el-table-column>
         </el-table>
+          <p class="paga-tip" v-if="page.roll_loading"><i class="el-icon-loading"></i>加载中...</p>
+          <p class="paga-tip" v-if="noMore && page.isShow">没有更多了</p>
         </el-scrollbar>
       </el-col>
     </el-row>
@@ -109,6 +114,7 @@
 
 <script>
 import {getRequest, postRequest} from '@/utils/api'
+import {isNotNullORBlank} from '../utils/utils'
 export default {
   data () {
     return {
@@ -116,7 +122,10 @@ export default {
       tableDesc: '数据加载中···',
       page: {
         currentPage: 1,
-        pageSize: 8
+        pageSize: 8,
+        totle: 0,
+        roll_loading: false,
+        isShow: false
       },
       searchOpt: {
         keywords: '',
@@ -137,12 +146,21 @@ export default {
   },
   mounted: function () {
     this.loading = true
-    this.loadBlogList(this.page.currentPage, this.page.pageSize)
+    this.loadBlogList(this.page.currentPage, this.page.pageSize, false)
     var _this = this
     window.bus.$on('blogTableReload', function () {
       _this.loading = true
-      _this.loadBlogList(_this.page.currentPage, _this.page.pageSize)
+      _this.loadBlogList(_this.page.currentPage, _this.page.pageSize, false)
     })
+  },
+  computed: {
+    noMore () {
+      this.tableData.length > this.page.pageSize ? this.page.isShow = true : this.page.isShow = false
+      return this.tableData.length >= this.page.totle
+    },
+    disabled () {
+      return this.page.roll_loading || this.noMore
+    }
   },
   methods: {
     handleEdit (id) {
@@ -150,13 +168,29 @@ export default {
     },
     searchClick () {
       this.loading = true
-      this.loadBlogList(1, this.page.pageSize)
+      this.page.currentPage = 1
+      this.loadBlogList(this.page.currentPage, this.page.pageSize, false)
     },
-    loadBlogList (page, count) {
+    rollLoad () {
+      let _this = this
+      this.page.roll_loading = true
+      setTimeout(() => {
+        _this.loadBlogList(_this.page.currentPage + 1, _this.page.pageSize, true)
+      }, 200)
+    },
+    loadBlogList (page, count, isAppend) {
       let url = '/blog/list?state=' + this.state + '&page=' + page + '&count=' + count + '&keywords=' + this.searchOpt.keywords + '&typeid=' + this.searchOpt.typeValue
       getRequest(url).then(resp => {
         if (resp.status === 200 && resp.data.code === 0) {
-          this.tableData = resp.data.reqData.blogs
+          // this.tableData = resp.data.reqData.blogs
+          // this.tableData = Object.assign([], this.tableData, resp.data.reqData.blogs)
+          this.page.totle = resp.data.reqData.totle
+          if (isAppend) {
+            this.tableData = this.tableData.concat(resp.data.reqData.blogs)
+            this.page.roll_loading = false
+          } else {
+            this.tableData = resp.data.reqData.blogs
+          }
           if (this.tableData.length === 0) {
             this.tableDesc = '暂无数据'
           }
@@ -273,6 +307,11 @@ a{
 }
 .data_warp .table-scrollbar>>>.el-scrollbar__wrap{
   overflow-x: hidden;
+}
+.data_warp .paga-tip{
+  text-align: center;
+  font-size: 9px;
+  color: #999;
 }
 .grid-content{
   line-height: 50px;
