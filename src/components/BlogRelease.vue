@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="BlogRelaase">
     <el-row class="title">
       <el-col :span="24">
         <el-input
@@ -307,5 +307,11 @@ export default{
     height:50px;
     font-size: 15px;
     padding: 12px 26px;
+  }
+  .BlogRelaase .content .add-image-link{
+    min-width: 540px;
+  }
+  .BlogRelaase .content .add-image-link .title{
+    min-width: 460px;
   }
 </style>
