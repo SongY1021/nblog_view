@@ -64,7 +64,7 @@
             </a>
           </li>
           <li class="toolbar_item" @mouseover="selectStatus">
-            <el-dropdown @command="handleCommand">
+            <el-dropdown @command="handleCommand" >
               <a href="javascript:;" class="box_item">
                 <span class="el-dropdown-link">
                   {{currentUserName}}
@@ -160,7 +160,6 @@ export default {
       }
     },
     selectStatus () {
-      this.isSelect = !this.isSelect
     },
     handleCommand (command) {
       var _this = this

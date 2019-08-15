@@ -23,7 +23,7 @@
     <el-row class="content" >
       <el-col :span="24" >
         <div class="editor" v-bind:style="{ height: heightNum }">
-          <mavon-editor style="width: 100%; height: 100%;" ref=md v-model="blog.mdContent" class="editor" aria-placeholder></mavon-editor>
+          <mavon-editor style="width: 100%; height: 100%;" ref=md v-model="blog.mdContent" @imgAdd="imgAdd" class="editor" aria-placeholder></mavon-editor>
         </div>
       </el-col>
     </el-row>
@@ -72,7 +72,7 @@
   </div>
 </template>
 <script>
-import {getRequest, postRequest} from '@/utils/api'
+import {getRequest, postRequest, uploadFileRequest} from '@/utils/api'
 import {mavonEditor} from 'mavon-editor'
 import {isNotNullORBlank} from '../utils/utils'
 import 'mavon-editor/dist/css/index.css'
@@ -154,6 +154,19 @@ export default{
       }
       this.inputVisible = false
       this.inputValue = ''
+    },
+    imgAdd (pos, $file) {
+      var _this = this
+      // 第一步.将图片上传到服务器.
+      var formdata = new FormData()
+      formdata.append('image', $file)
+      uploadFileRequest('/blog/uploadimg', formdata).then(resp => {
+        if (resp.status === 200 && resp.data.code === 0) {
+          _this.$refs.md.$imglst2Url([[pos, resp.data.reqData.imgPath]])
+        } else {
+          _this.$message({type: resp.data.code, message: resp.data.msg})
+        }
+      })
     },
     saveBlog (s) {
       if (!this.checkForm()) {
