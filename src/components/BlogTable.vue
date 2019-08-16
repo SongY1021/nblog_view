@@ -159,7 +159,6 @@ export default {
       return this.tableData.length >= this.page.totle
     },
     disabled () {
-      console.info('调用了')
       return this.page.roll_loading || this.noMore
     }
   },

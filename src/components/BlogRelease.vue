@@ -23,7 +23,7 @@
     <el-row class="content" >
       <el-col :span="24" >
         <div class="editor" v-bind:style="{ height: heightNum }">
-          <mavon-editor style="width: 100%; height: 100%;" ref=md v-model="blog.mdContent" @imgAdd="imgAdd" class="editor" aria-placeholder></mavon-editor>
+          <mavon-editor style="width: 100%; height: 100%;" ref=md v-model="blog.mdContent" v-on:change="autoSave" @imgAdd="imgAdd" class="editor" aria-placeholder></mavon-editor>
         </div>
       </el-col>
     </el-row>
@@ -82,6 +82,8 @@ export default{
       loading: false,
       heightNum: '400px',
       r_state: 1,
+      isAutoSave: true,
+      localTime: new Date().toTimeString().substr(0, 8),
       blog: {
         id: '',
         typeid: '',
@@ -219,6 +221,26 @@ export default{
         return false
       }
       return true
+    },
+    autoSave () {
+      setTimeout(() => {
+        if (this.isAutoSave) {
+          this.isAutoSave = false
+          this.$notify({
+            dangerouslyUseHTMLString: true,
+            position: 'bottom-right',
+            // message: h ('i',{ style: 'color: teal'}, '文章保存成功，时间:' + new Date().toTimeString().substr(0, 8)),
+            message: '<strong style="color: teal">文章保存成功，当前时间: ' + this.localTime + '</strong>',
+            offset: 100,
+            showClose: false,
+            duration: 0,
+            onClose: () => {
+              this.isAutoSave = true
+              console.info('关闭了')
+            }
+          })
+        }
+      }, 5000)
     }
   }
 }
