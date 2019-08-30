@@ -33,7 +33,7 @@ export default new Router({
           name: '博客列表',
           component: BlogList,
           meta: {
-            keepAlive: false
+            keepAlive: true
           }
         }, {
           path: '/BlogRelease',

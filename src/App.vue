@@ -26,3 +26,7 @@ export default {
     overflow: hidden;
   }
 </style>
+
+<style lang="less">
+  @import './styles/scrollBar';
+</style>

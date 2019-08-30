@@ -24,7 +24,7 @@
     </el-row>
     <el-row>
       <el-col :span="24" class="data_warp" v-bind:style="{ height: heightNum }">
-        <el-scrollbar class="table-scrollbar">
+        <!--<el-scrollbar class="table-scrollbar">-->
           <el-table
           :data="tableData"
           :show-header="false"
@@ -33,7 +33,8 @@
           v-infinite-scroll="rollLoad"
           :infinite-scroll-disabled="disabled"
           infinite-scroll-immediate="false"
-          style="width: 100%; height: 100%;">
+          class="el-scrollbar"
+          style="width: 100%; height: 100%; overflow-y: auto;">
           <el-table-column>
             <template slot-scope="scope">
               <el-row>
@@ -53,7 +54,8 @@
               <el-row>
                 <el-col :span="24">
                   <div class="grid-summary">
-                    {{ scope.row.summary }}
+                    <!--{{ scope.row.summary }}-->
+                    {{ scope.$index }}
                   </div>
                 </el-col>
               </el-row>
@@ -101,12 +103,16 @@
                   </div>
                 </el-col>
               </el-row>
+              <el-row v-if="scope.$index === (tableData.length-1)">
+                <el-col>
+                  <p class="paga-tip" v-if="page.roll_loading"><i class="el-icon-loading"></i>加载中...</p>
+                  <p class="paga-tip" v-if="noMore && page.isShow">没有更多了</p>
+                </el-col>
+              </el-row>
             </template>
           </el-table-column>
         </el-table>
-          <p class="paga-tip" v-if="page.roll_loading"><i class="el-icon-loading"></i>加载中...</p>
-          <p class="paga-tip" v-if="noMore && page.isShow">没有更多了</p>
-        </el-scrollbar>
+        <!--</el-scrollbar>-->
       </el-col>
     </el-row>
   </div>
@@ -280,10 +286,10 @@ export default {
 a{
   text-decoration: none;
 }
-/*.table-scrollbar{*/
-  /*overflow-x: hidden;*/
-  /*height: 100%;*/
-/*}*/
+.table-scrollbar{
+  overflow-x: hidden;
+  height: 100%;
+}
 .toolbar{
   min-width: 510px;
   padding: 20px 10px;
@@ -296,7 +302,7 @@ a{
 }
 .data_warp{
   height: 670px;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 .data_warp_min{
   height: 450px;
@@ -312,6 +318,9 @@ a{
   text-align: center;
   font-size: 9px;
   color: #999;
+}
+.data_warp .el-table:before {
+  height: 0;
 }
 .grid-content{
   line-height: 50px;

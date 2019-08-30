@@ -48,6 +48,11 @@
               <i class="icon-font el-icon-nblog-zhankai" v-if="isCollapse"></i>
             </a>
           </li>
+          <li class="toolbar_item"  @click="collapseStatus" title="前端">
+            <a href="javascript:;" class="box_item">
+              <i class="icon-font el-icon-nblog-diqiu"></i>
+            </a>
+          </li>
         </ul>
         <ul class="toolbar_menu menu_right">
           <li class="toolbar_item" title="消息">
